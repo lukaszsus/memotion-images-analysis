@@ -1,2 +1,0 @@
-DATA_PATH = '/media/lukasz/Dane/Studia/IX_semestr/Analiza_obrazow_i_wideo/memotion-images-analysis/data/'
-PROJECT_PATH = '/media/lukasz/Dane/Studia/IX_semestr/Analiza_obrazow_i_wideo/memotion-images-analysis/'
