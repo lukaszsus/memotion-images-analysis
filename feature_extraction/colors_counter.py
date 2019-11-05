@@ -13,6 +13,6 @@ class ColorCounter():
         h, w, d = image.shape
         n_pix = h * w
         im = image.reshape((-1, 3))
-        n_colors = np.unique(im)
+        n_colors = np.unique(im, axis=0).shape[0]
         factor = n_colors / n_pix
         return factor

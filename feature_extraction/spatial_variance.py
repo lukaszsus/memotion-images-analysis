@@ -11,7 +11,7 @@ class SpatialVariance():
     def hsv_var(self, image, filter_size):
         """
         Count variance of colors in HSV model. It counts local variance separately for every dimension in HSV.
-        :param image: image in RGB, values scale 0-255
+        :param image: image in RGB, values scale 0-255, numpy
         :param filter_size: filter size to determine meaning of 'local'
         :return: standard stats (mean, percentiles) of variances in H, S and V spaces
         """
