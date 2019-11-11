@@ -17,11 +17,11 @@ def make_scatter_pairplot(df: pd.DataFrame, plot_path):
     plt.savefig(plot_path, bbox_inches='tight')
 
 
-if __name__ == '__main__':
+def main(dataset_name):
     # paths
     create_results_dir()
-    file_path = os.path.join(DATA_PATH, "test_dataset.csv")
-    labels_path = os.path.join(DATA_PATH, "test_dataset_labels.pickle")
+    file_path = os.path.join(DATA_PATH, dataset_name + ".csv")
+    labels_path = os.path.join(DATA_PATH, dataset_name + "_labels.pickle")
 
     # load data
     df = pd.read_csv(file_path)
@@ -35,9 +35,14 @@ if __name__ == '__main__':
 
     # plot
     plot_path = os.path.join(PROJECT_PATH, "results/plots")
-    plot_path = os.path.join(plot_path, "test_dataset_scatter_plot.pdf")
+    plot_path = os.path.join(plot_path, dataset_name + "_scatter_plot.pdf")
     make_scatter_pairplot(df[df.columns[1:]], plot_path)
 
     # index to feature name
     for i in range(len(features)):
         print("{}: {}".format(i, features[i]))
+
+
+if __name__ == '__main__':
+    # main("test_dataset")
+    main("test_dataset_hsv_var")
