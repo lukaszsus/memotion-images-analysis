@@ -2,8 +2,7 @@ import os
 import cv2
 from matplotlib import pyplot as plt
 # import seaborn as sns
-
-from user_settings import DATA_PATH
+from settings import DATA_PATH
 
 
 class SingleImagePlotter():

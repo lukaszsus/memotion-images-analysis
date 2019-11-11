@@ -6,7 +6,7 @@ class BilateralFilter():
     def __init__(self, neighbourhood, sigma_color, sigma_space):
         """
         :param neighbourhood: diameter of each pixel neighborhood that is used during filtering
-        :param sigma_color: larger value means that farther colors within the pixel neighborhood will be mixed together,
+        :param sigma_color: larger value means that farther colors within the pixel neighborhood will be other together,
                resulting in larger areas of semi-equal color
         :param sigma_space: larger value means that farther pixels will influence each other if their colors are close
         """

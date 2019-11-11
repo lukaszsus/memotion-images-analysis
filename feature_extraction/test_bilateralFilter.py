@@ -18,6 +18,5 @@ class TestBilateralFilter(TestCase):
         bilateral_filter = BilateralFilter(30, 50, 50)
         color_diffs_photo = bilateral_filter.mean_color_diffs(im_photo)
         color_diffs_cartoon = bilateral_filter.mean_color_diffs(im_cartoon)
-
         self.assertGreater(color_diffs_photo, color_diffs_cartoon)
 

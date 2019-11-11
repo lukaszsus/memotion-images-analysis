@@ -3,17 +3,17 @@ import os
 import matplotlib.pyplot as plt
 from unittest import TestCase
 from data_loader.utils import load_image_as_array
-from feature_extraction.spatial_variance import SpatialVariance
+from feature_extraction.hsv_analyser import HsvAnalyser
 from settings import DATA_PATH
 
 
-class TestSpatialVariance(TestCase):
+class TestHsvAnalyser(TestCase):
     def test_angle_cos_var(self):
         file_path = os.path.join(DATA_PATH, "photo")
         file_path = os.path.join(file_path, "funny-game-of-thrones-memes-fb__700.jpg")
         im = load_image_as_array(file_path)
         print(im.shape)
-        spatial_variance = SpatialVariance()
+        spatial_variance = HsvAnalyser()
         features = spatial_variance.hsv_var(im, (5, 5))
         expected = np.array([8.20562953e-04, 4.93038066e-32, 2.67054637e-09, 1.96633129e-07,
                              9.88124716e-07, 6.82860813e-05, 1.10551960e-02, 0.00000000e+00,
@@ -34,7 +34,7 @@ class TestSpatialVariance(TestCase):
         im_paint = load_image_as_array(file_paint)
         print(im_paint.shape)
 
-        spatial_variance = SpatialVariance()
+        spatial_variance = HsvAnalyser()
         features_photo = spatial_variance.saturation_distribution(im_photo)
         features_paint = spatial_variance.saturation_distribution(im_paint)
 
@@ -63,7 +63,7 @@ class TestSpatialVariance(TestCase):
         im_paint = load_image_as_array(file_paint)
         print(im_paint.shape)
 
-        spatial_variance = SpatialVariance()
+        spatial_variance = HsvAnalyser()
         features_photo = spatial_variance.sat_value_distribution(im_photo)
         features_paint = spatial_variance.sat_value_distribution(im_paint)
 
@@ -76,5 +76,4 @@ class TestSpatialVariance(TestCase):
         plt.show()
         # Histograms have a very high not saturated pixels.
         # It is probably cased by white and black background and text in memes.
-
         self.assertTrue(True)
