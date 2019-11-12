@@ -14,8 +14,8 @@ class TestColorCounter(TestCase):
         im_photo = load_image_as_array(file_photo)
         # print(im_photo.shape)
 
-        file_paint = os.path.join(DATA_PATH, "painting")
-        file_paint = os.path.join(file_paint, "5d646e19b30e1.jpeg")
+        file_paint = os.path.join(DATA_PATH, "text")
+        file_paint = os.path.join(file_paint, "FB_IMG_1482177388795.jpg")
         im_paint = load_image_as_array(file_paint)
         # print(im_paint.shape)
 
@@ -27,6 +27,8 @@ class TestColorCounter(TestCase):
         features_photo = color_counter.norm_color_count(im_photo)
         features_paint = color_counter.norm_color_count(im_paint)
         features_cartoon = color_counter.norm_color_count(im_cartoon)
+        print(features_paint)
+        print(features_cartoon, '\n')
 
         diff_painting = features_photo - features_paint
         diff_cartoon = features_photo - features_cartoon
