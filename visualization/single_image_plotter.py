@@ -1,7 +1,9 @@
 import os
 import cv2
 from matplotlib import pyplot as plt
-# import seaborn as sns
+import seaborn as sns
+sns.set()
+sns.set_palette("hls")
 
 from user_settings import DATA_PATH
 

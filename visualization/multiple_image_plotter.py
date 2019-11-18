@@ -3,7 +3,9 @@ import cv2
 from matplotlib import pyplot as plt
 import glob
 import numpy as np
-# import seaborn as sns
+import seaborn as sns
+sns.set()
+sns.set_palette("hls")
 
 from user_settings import DATA_PATH
 
@@ -48,7 +50,7 @@ class MultipleImagePlotter():
             histr = cv2.calcHist([image], [0], None, [256], [0, 256])
             all_hists += histr
 
-        plt.plot(all_hists)
+        plt.plot(all_hists / len(img_names))
         plt.xlim([0, 256])
         plt.yscale(scale)
         plt.show()
