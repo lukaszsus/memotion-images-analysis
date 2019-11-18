@@ -4,17 +4,16 @@ from sklearn import datasets
 from sklearn.naive_bayes import GaussianNB, ComplementNB
 import numpy as np
 
+from classifiers.base_classifier import BaseClassifier
 from user_settings import PROJECT_PATH
-from classifiers.classifiers_utils import plot_confusion_matrix
 
 
-class NaiveBayes():
+class NaiveBayes(BaseClassifier):
     """
     Class implementing multiple kinds of Naive Bayes algorithm.
     """
-    def __init__(self, x, y):
-        self.x = np.array(x)
-        self.y = np.array(y)
+    def __init__(self, x, y, x_feature_names, y_label_names):
+        super().__init__(x, y, x_feature_names, y_label_names)
 
     def gaussian_navie_bayes(self):
         """
@@ -22,7 +21,7 @@ class NaiveBayes():
         :return: y predicted for given x (x train in that case)
         """
         gnb = GaussianNB()
-        y_pred = gnb.fit(self.x, self.y).predict(self.x)
+        gnb, y_pred = self.predict(gnb)
         return y_pred
 
     def complement_navie_bayes(self):
@@ -31,7 +30,7 @@ class NaiveBayes():
         :return: y predicted for given x (x train in that case)
         """
         cnb = ComplementNB()
-        y_pred = cnb.fit(self.x, self.y).predict(self.x)
+        cnb, y_pred = self.predict(cnb)
         return y_pred
 
 
@@ -42,9 +41,10 @@ if __name__ == "__main__":
     with open(dataset_path, "rb") as f:
         x, y, x_feature_names, y_feature_names = pkl.load(f)
 
-    nb = NaiveBayes(x, y)
+    nb = NaiveBayes(x, y, x_feature_names, y_feature_names)
     y_pred_gaussian = nb.gaussian_navie_bayes()
-    plot_confusion_matrix(y, y_pred_gaussian, y_feature_names)
+    nb.plot_confusion_matrix(y_pred_gaussian)
+    nb.show_basic_metrics(y_pred_gaussian)
 
     # y_pred_complement = nb.complement_navie_bayes()
     # plot_confusion_matrix(y, y_pred_complement, y_feature_names)

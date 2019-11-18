@@ -1,4 +1,4 @@
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, accuracy_score, f1_score
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -25,3 +25,16 @@ def plot_confusion_matrix(y_test, y_pred, class_names, cmap=plt.cm.Greens):
     plt.ylim(plt.ylim()[0] - 0.5, plt.ylim()[1] + 0.5)
     plt.grid(False)
     plt.show()
+
+
+def count_basic_metrics(y_true, y_pred):
+    acc = accuracy_score(y_true, y_pred)
+    f1 = f1_score(y_true, y_pred, average='weighted')
+    return acc, f1
+
+
+def show_basic_metrics(y_true, y_pred):
+    acc, f1 = count_basic_metrics(y_true, y_pred)
+    print(f'-------------------')
+    print(f'Accuracy: {round(acc*100, 2)}%')
+    print(f'F-score:  {round(f1*100, 2)}%')
