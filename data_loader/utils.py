@@ -23,7 +23,9 @@ def load_image_as_norm_array(file_path):
 
 def load_image_as_array(file_path):
     """
-    Funtion load single image from file.
+    It has some problems with PNG files. It sometimes read them as two dimensional, not three dimensional.
+    It is recommended to use load_image_by_cv2 function instead.
+    Function load single image from file.
     :param file_path:
     :return: image as numpy array
     """
@@ -36,7 +38,7 @@ def load_image_as_array(file_path):
 
 def load_image_by_cv2(file_path):
     """
-    Function load single image from file using cv2 method. Probably still loads image in BGR...
+    Function load single image from file using cv2 method.
     :param file_path:
     :return: image as numpy array
     """

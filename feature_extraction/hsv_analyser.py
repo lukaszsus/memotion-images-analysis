@@ -4,26 +4,32 @@ import matplotlib
 import numpy as np
 
 
-class SpatialVariance():
-    def __init__(self):
+class HsvAnalyser():
+    def __init__(self, im: np.array=None):
         self.n_bins = [15, 20, 25]      # numbers of bins used to create histogram
+        self.im = None
+        if im is not None:
+            self.set_image(im)
 
-    def hsv_var(self, image, filter_size):
+    def set_image_and_convert_to_hsv(self, im: np.array):
+        self.im_hsv = matplotlib.colors.rgb_to_hsv(im)
+        self.cos_hues = np.cos(self.im_hsv[:, :, 0])
+        self.saturation = self.im_hsv[:, :, 1]
+        self.value = self.im_hsv[:, :, 2] / 255.0     # normalization
+
+    def hsv_var(self, image=None, filter_size=(5, 5)):
         """
         Count variance of colors in HSV model. It counts local variance separately for every dimension in HSV.
-        :param image: image in RGB, values scale 0-255, numpy
+        :param image: image in RGB, self.values scale 0-255, numpy
         :param filter_size: filter size to determine meaning of 'local'
         :return: standard stats (mean, percentiles) of variances in H, S and V spaces
         """
+        if image is not None:
+            self.set_image_and_convert_to_hsv(image)
         variances = list()
         ver_step, hor_step = filter_size
-        im_hsv = matplotlib.colors.rgb_to_hsv(image)
 
-        cos_hues = np.cos(im_hsv[:, :, 0])
-        saturation = im_hsv[:, :, 1]
-        value = im_hsv[:, :, 2] / 255.0     # normalization
-
-        im = np.stack([cos_hues, saturation, value], axis=2)
+        im = np.stack([self.cos_hues, self.saturation, self.value], axis=2)
         for i in range(im.shape[0] - ver_step):
             for j in range(im.shape[1] - hor_step):
                 local_im = im[i:i + ver_step, j:j + hor_step, :]
@@ -35,42 +41,41 @@ class SpatialVariance():
         value_stats = self.__get_stat_metrics(variances[:, 2])
         return np.concatenate([hue_stats, sat_stats, value_stats])
 
-    def saturation_distribution(self, image, n_bins = None):
+    def saturation_distribution(self, image=None, n_bins = None):
         """
-        It prepares saturation distribution. It makes them for different numbers of bins,
+        It prepares self.saturation distribution. It makes them for different numbers of bins,
         defined in n_bins.
         :param image: image to process
         :param n_bins: List of n_bins to make histogram of; if None it takes default [15, 20, 25].
         :return:
         """
+        if image is not None:
+            self.set_image_and_convert_to_hsv(image)
         n_bins = self.__parse_n_bins(n_bins)
-        im_hsv = matplotlib.colors.rgb_to_hsv(image)
-        saturation = im_hsv[:, :, 1].reshape((-1, 1)).squeeze()
         distributions = list()
         for n_bin in n_bins:
-            dist, _ = np.histogram(saturation, bins=n_bin)
+            dist, _ = np.histogram(self.saturation, bins=n_bin)
             # Normalize it manually because I want distribution to sum up to 1.
             # Arguments 'density' and 'normed' in np.histogram does not work like that.
             dist = dist / np.sum(dist)
             distributions.extend(dist)
         return np.array(distributions)
 
-    def sat_value_distribution(self, image, n_bin = None):
+    def sat_value_distribution(self, image=None, n_bin=None):
         """
-        It prepares 2d distribution of saturation and value. For examined examples, saturation histograms
+        It prepares 2d distribution of self.saturation and self.value. For examined examples, self.saturation histograms
         came out strange, with a huge number of unsaturated pixels. Probably because of white and black
-        background and text in memes. I decided to create second method sat_value_distribution to distinguish them.
+        background and text in memes. I decided to create second method sat_self.value_distribution to distinguish them.
         I prepares 2 dimensional histogram.
         It counts histogram only for one number of bins because if makes a fairly long feature vector.
         :param image:
         :param n_bin: Number of bins to make histogram of; if None it takes default 20.
         :return:
         """
+        if image is not None:
+            self.set_image_and_convert_to_hsv(image)
         n_bin = 20 if n_bin is None else n_bin
-        im_hsv = matplotlib.colors.rgb_to_hsv(image)
-        saturation = im_hsv[:, :, 1].reshape((-1, 1)).squeeze()
-        values = im_hsv[:, :, 2].reshape((-1, 1)).squeeze() / 255.0     # normalization
-        distribution, _s, _v = np.histogram2d(saturation, values, bins=n_bin)  # density makes normalization
+        distribution, _s, _v = np.histogram2d(self.saturation, self.values, bins=n_bin)  # density makes normalization
         # Normalize it manually because I want distribution to sum up to 1.
         # Arguments 'density' and 'normed' in np.histogram does not work like that.
         distribution = distribution / np.sum(distribution)

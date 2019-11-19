@@ -3,7 +3,7 @@ import numpy as np
 from unittest import TestCase
 
 from data_loader.utils import load_image_as_array
-from feature_extraction.colors_counter import ColorCounter
+from feature_extraction.color_counter import ColorCounter
 from settings import DATA_PATH
 
 
