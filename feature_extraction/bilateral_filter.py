@@ -1,4 +1,5 @@
 import numpy as np
+from time import time
 import cv2
 
 
@@ -14,7 +15,7 @@ class BilateralFilter():
         self.sigma_color = sigma_color
         self.sigma_space = sigma_space
 
-    def _apply_filter(self, image):
+    def apply_filter(self, image):
         """
         Applies bilateral filtering on the image
         :param image: image as numpy array
@@ -22,15 +23,33 @@ class BilateralFilter():
         """
         return cv2.bilateralFilter(image, self.neigh, self.sigma_color, self.sigma_space)
 
-    def mean_color_diffs(self, image):
-        im_bil = self._apply_filter(image).reshape((-1, 3))
+    def mean_color_diffs(self, image, bilateraled_image=None):
+        """
+        Counts mean color differences within all colors.
+        :param image: original image as matrix cv2_image
+        :param bilateraled_image: image as matrix after bilateral filter
+        :return: mean difference (any number)
+        """
+        if bilateraled_image is not None:
+            im_bil = bilateraled_image.reshape((-1, 3))
+        else:
+            im_bil = self.apply_filter(image).reshape((-1, 3))
         im = image.reshape((-1, 3))
 
         diff = np.mean(im - im_bil, axis=1)
         return np.mean(diff)
 
-    def n_color_diff(self, image):
-        im_bil = self._apply_filter(image).reshape((-1, 3))
+    def n_color_diff(self, image, bilateraled_image=None):
+        """
+        Counts normalized difference between unique colors in image before and after filter.
+        :param image: original image as matrix cv2_image
+        :param bilateraled_image: image as matrix after bilateral filter
+        :return: normalized number of unique colors differences (from 0 to 1)
+        """
+        if bilateraled_image is not None:
+            im_bil = bilateraled_image.reshape((-1, 3))
+        else:
+            im_bil = self.apply_filter(image).reshape((-1, 3))
         im = image.reshape((-1, 3))
         n_pix = im.shape[0]
 
