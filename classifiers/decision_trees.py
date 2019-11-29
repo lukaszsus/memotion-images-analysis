@@ -97,22 +97,20 @@ class DecisionTree(BaseClassifier):
 if __name__ == "__main__":
 
     # You need to have dataset_pics.pkl file in main repository.
-    dataset_path = os.path.join(PROJECT_PATH, 'dataset_pics.pkl')
+    dataset_path = os.path.join(PROJECT_PATH, 'datasets_pkl/dataset_pics.pkl')
     with open(dataset_path, "rb") as f:
         x, y, x_feature_names, y_feature_names = pkl.load(f)
-
-    # x = numpy.array(x)[:, 0].reshape(-1, 1)
 
     max_depth, min_samples_leaf = 3, 5
     dt = DecisionTree(x, y, x_feature_names, y_feature_names, max_depth=max_depth, min_samples_leaf=min_samples_leaf)
 
-    y_pred_tree = dt.crossval_decision_tree()
+    tree, y_pred_tree = dt.decision_tree()
     dt.plot_confusion_matrix(y_pred_tree)
     dt.show_basic_metrics(y_pred_tree)
 
-    y_pred_forest = dt.crossval_random_forest(num_estimators=15)
-    dt.plot_confusion_matrix(y_pred_forest)
-    dt.show_basic_metrics(y_pred_forest)
+    # y_pred_forest = dt.crossval_random_forest(num_estimators=15)
+    # dt.plot_confusion_matrix(y_pred_forest)
+    # dt.show_basic_metrics(y_pred_forest)
 
-    # file_name = f'decission_tree_depth{max_depth}_samples{min_samples_leaf}'
-    # dt.save_and_plot_tree(tree, file_name)
+    file_name = f'decission_tree_depth{max_depth}_samples{min_samples_leaf}'
+    dt.save_and_plot_tree(tree, file_name)

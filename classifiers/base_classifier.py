@@ -46,9 +46,10 @@ class BaseClassifier():
         y_pred = cross_val_predict(clf, self.x, self.y, cv=self.cv_parts)
         return y_pred
 
-    def plot_confusion_matrix(self, y_pred, y_test=None, cmap=plt.cm.Greens):
+    def plot_confusion_matrix(self, y_pred, y_test=None, label='', cmap=plt.cm.Greens):
         """
         Plots normalized confusion matrix.
+        :param label: name of classifier to print e.g. decission tree / kNN
         :param y_pred: predictions for given earlier x
         :param y_test: true y_test labels; needed if using 'predict' method with given x_test
         :param cmap: matplotlib color map
@@ -63,9 +64,12 @@ class BaseClassifier():
         im = ax.imshow(cm, interpolation='nearest', cmap=cmap)
         ax.figure.colorbar(im, ax=ax)
 
+        if len(label) > 0:
+            label = f'for instance of {label}\n'
+
         ax.set(xticks=np.arange(cm.shape[1]), yticks=np.arange(cm.shape[0]),
                xticklabels=self.label_names, yticklabels=self.label_names,
-               title=f'Confusion matrix of {self.__class__.__name__} class\n',
+               title=f'Confusion matrix of {self.__class__.__name__} class\n{label}',
                ylabel='True label', xlabel='Predicted label')
 
         plt.setp(ax.get_xticklabels(), rotation_mode="anchor")
@@ -79,7 +83,7 @@ class BaseClassifier():
         plt.grid(False)
         plt.show()
 
-    def _count_basic_metrics(self, y_pred, y_test, f1_type='macro'):
+    def count_basic_metrics(self, y_pred, y_test=None, f1_type='macro'):
         """
         Counts matrics - accuracy and f1_score
         :param y_pred: predictions for given earlier x
@@ -87,20 +91,23 @@ class BaseClassifier():
         :param f1_type: f1-score type
         :return: value of accuracy and f1-score
         """
+        if y_test is None:
+            y_test = self.y
         acc = accuracy_score(y_test, y_pred)
         f1 = f1_score(y_test, y_pred, average=f1_type)
         return acc, f1
 
-    def show_basic_metrics(self, y_pred, y_test=None):
+    def show_basic_metrics(self, y_pred, y_test=None, label=None):
         """
         Prints basic metrics for classifier.
+        :param label: name of classifier to print e.g. decission tree / kNN
         :param y_pred: predictions for given earlier x
         :param y_test: true y_test labels; needed if using 'predict' method with given x_test
         :return: prints in console values of metrics from count_basic_metrics method
         """
-        if y_test is None:
-            y_test = self.y
-        acc, f1 = self._count_basic_metrics(y_pred, y_test)
-        print(f'-------------------')
-        print(f'Accuracy: {round(acc * 100, 2)}%')
-        print(f'F-score:  {round(f1 * 100, 2)}%')
+        acc, f1 = self.count_basic_metrics(y_pred, y_test)
+        print(f'----------------------------------')
+        if label is not None:
+            print(f'Metrics for {label}:')
+        print(f'accuracy: {round(acc * 100, 2)}%')
+        print(f'f-score:  {round(f1 * 100, 2)}%')
