@@ -9,7 +9,7 @@ import pickle as pkl
 
 from data_loader.utils import load_image_by_cv2
 from feature_extraction.bilateral_filter import BilateralFilter
-
+from settings import PROJECT_PATH
 
 from user_settings import DATA_PATH
 
@@ -20,6 +20,7 @@ class DataSaver():
     def __init__(self, dataset_type):
         # TODO use Łukaszs code to do this, after merge :D
         self.data_type = dataset_type
+        self.path = os.path.join(PROJECT_PATH, 'datasets_pkl')
 
     def _load_data_from_one_directory(self, label_name):
         path = os.path.join(DATA_PATH, label_name)
@@ -34,7 +35,7 @@ class DataSaver():
 
     def _get_dataset_from_one_directory(self, label_name, images_cv2):
         ''' FEATURES '''
-        bf = BilateralFilter(30, 50, 50)
+        bf = BilateralFilter(50, 40, 40)
         x_data, y_data = [], [LABELS.index(label_name) for _ in images_cv2]
         for i, image in enumerate(images_cv2):
             x_data.append([])
@@ -58,7 +59,7 @@ class DataSaver():
         x_feature_names = ['bilateral_mean_color_diff', 'bilateral_norm_color_diff']
         return x, y, x_feature_names, LABELS
 
-    def save_dataset_to_file(self, x, y, x_feature_names, y_feature_names):
-        fname = f"dataset_{self.data_type}.pkl"
-        with open(fname, "wb") as fout:
+    def save_dataset_to_file(self, x, y, x_feature_names, y_feature_names, dataset_name):
+        fname = f"{self.data_type}_{dataset_name}.pkl"
+        with open(os.path.join(self.path, fname), "wb") as fout:
             pkl.dump([x, y, x_feature_names, y_feature_names], fout, protocol=-1)

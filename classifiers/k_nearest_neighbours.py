@@ -6,13 +6,33 @@ from user_settings import PROJECT_PATH
 
 
 class NearestNeighbours(BaseClassifier):
-    def __init__(self, x, y, x_feature_names, y_label_names, n_neigh=3):
-        super().__init__(x, y, x_feature_names, y_label_names)
-        self.num_neighbours = n_neigh
+    """
+    Class implementing basic kNN algorithm.
+    """
+    def __init__(self, x, y, x_feature_names, y_label_names, cv_parts=5, n_neigh=3):
+        """
+        Child of BaseClassifier __init__()
+        :param n_neigh: number of neighbours to consider
+        """
+        super().__init__(x, y, x_feature_names, y_label_names, cv_parts)
+        self.num_neighbors = n_neigh
 
-    def knn(self):
-        knn = KNeighborsClassifier(n_neighbors=self.num_neighbours)
-        knn, y_pred = self.predict(knn)
+    def knn(self, x_test=None):
+        """
+        Basic kNN.
+        :return: y predict default for x_train (but can be for x_test if given)
+        """
+        knn = KNeighborsClassifier(n_neighbors=self.num_neighbors)
+        knn, y_pred = self._predict(knn, x_test)
+        return y_pred
+
+    def crossval_knn(self):
+        """
+        Basic kNN using cross validation.
+        :return: y predict for cross-validated dataset
+        """
+        knn = KNeighborsClassifier(n_neighbors=self.num_neighbors)
+        y_pred = self._cross_val_predict(knn)
         return y_pred
 
 
@@ -24,8 +44,7 @@ if __name__ == "__main__":
         x, y, x_feature_names, y_feature_names = pkl.load(f)
 
     n_neighbours = 3
-    nn = NearestNeighbours(x, y, x_feature_names, y_feature_names, n_neighbours)
-    y_pred_knn = nn.knn()
-
+    nn = NearestNeighbours(x, y, x_feature_names, y_feature_names, n_neigh=n_neighbours)
+    y_pred_knn = nn.crossval_knn()
     nn.plot_confusion_matrix(y_pred_knn)
     nn.show_basic_metrics(y_pred_knn)

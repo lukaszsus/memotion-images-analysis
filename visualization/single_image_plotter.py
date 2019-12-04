@@ -1,16 +1,11 @@
 import os
 import cv2
 from matplotlib import pyplot as plt
-<<<<<<< HEAD
-# import seaborn as sns
-from settings import DATA_PATH
-=======
 import seaborn as sns
 sns.set()
 sns.set_palette("hls")
 
 from user_settings import DATA_PATH
->>>>>>> c180d81af2846304c55094aef7276f1744ec0691
 
 
 class SingleImagePlotter():
