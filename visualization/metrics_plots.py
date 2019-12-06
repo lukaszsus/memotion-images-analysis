@@ -14,6 +14,11 @@ sns.set()
 
 
 def load_datasets_metrics(filename):
+    """
+    Loads saved in default directory metrics.
+    :param filename: name of file to load
+    :return: metrics: dataframe with accuracy and fscore, dataframe with y_preds and confussion matrix
+    """
     path = os.path.join(DATA_PATH, f'results/{filename}')
     with open(path, "rb") as fin:
         df_metrics, df_y, confusion_matrices = pkl.load(fin)
@@ -21,6 +26,12 @@ def load_datasets_metrics(filename):
 
 
 def load_filenames(data_type):
+    """
+    TEMPORARY xD
+    Loads filenames in the same order as where saved (without given any order in fact).
+    :param data_type: directory from which to load data - memes or pics
+    :return: names of images and label names in right order
+    """
     LABELS = ('cartoon', 'painting', 'photo', 'text')
     image_names = []
 
@@ -34,11 +45,18 @@ def load_filenames(data_type):
 
 
 class MetricPlotter():
+    """
+    Class that plots some metrics using matplotlib.
+    """
 
     def __init__(self):
         pass
 
     def plot_df_metrics(self, df_metrics):
+        """
+        Plots barplot with metrics - accuracy and fscore - for each classifier.
+        :param df_metrics: dataframe with those metrics
+        """
         sns.set_palette("nipy_spectral")
 
         df = df_metrics.set_index(['Classifier'])
@@ -46,7 +64,14 @@ class MetricPlotter():
         df.plot.bar(rot=0)
         plt.show()
 
-    def plot_wrongly_classified_pictures(self, df_y, classifier):
+    def plot_wrongly_classified_pictures(self, df_y, classifier, number_of_images=5):
+        """
+        Plots given number of wrongly classified images with their true and predicted labels.
+        It goes through predicted labels and shows true that differs (not the other way round).
+        :param df_y: dataframe with predicted and true labels
+        :param classifier: classifier name that will be compared with true labels
+        :param number_of_images: number of images to show
+        """
         picture_names, label_names = load_filenames('pics')
         df_differ = df_y.loc[df_y['True labels'] != df_y[classifier]][['True labels', classifier]]
         df_differ['Filename'] = np.take(picture_names, df_differ.index.values)
@@ -54,10 +79,10 @@ class MetricPlotter():
         for i, pred_label in enumerate(label_names):
             pred_as_label = df_differ[df_differ[classifier] == i].values
 
-            fig, ax = plt.subplots(1, 5, figsize=(20, 8))
+            fig, ax = plt.subplots(1, number_of_images, figsize=(4*number_of_images, 8))
             fig.suptitle(f'Predicted label: {pred_label}', fontsize=36, fontweight='bold')
             pictures = np.random.permutation(pred_as_label)
-            for j in range(5):
+            for j in range(min(number_of_images, pictures.shape[0])):
                 img = cv2.imread(pictures[j][-1])
                 image = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
                 ax[j].imshow(image)
@@ -75,6 +100,6 @@ if __name__ == "__main__":
     mp = MetricPlotter()
     mp.plot_df_metrics(df_metrics)
 
-    classifier = 'k Nearest Neighbours'
+    classifier = 'Random Forest'
     mp.plot_wrongly_classified_pictures(df_y, classifier)
 

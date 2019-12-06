@@ -46,13 +46,25 @@ class KMeansSegmentator():
         return np.mean(diff)
 
     def _transform_to_hsv(self, image):
+        """
+        Transforms image from RGB to HSV.
+        :param image: numpy array representing image in RGB
+        :return: same array but in HSV
+        """
         return mpl.colors.rgb_to_hsv(image)
 
     def hsv_differences(self, image, kmeans_image):
+        """
+        Counts differences separately between all HSV channels before and after kMeans.
+        :param image: numpy array in RGB
+        :param kmeans_image: numpy array of transformed image in RGB
+        :return: differences on every channel: H, S and V
+                 H channel should *probably* be best for image classification
+        """
         image_hsv = self._transform_to_hsv(image)
         quant_hsv = self._transform_to_hsv(kmeans_image)
 
-        h_diff = np.mean(np.abs(image_hsv[:, :, 0] - quant_hsv[:, :, 0]))
-        s_diff = np.mean(np.abs(image_hsv[:, :, 1] - quant_hsv[:, :, 1]))
-        v_diff = np.mean(np.abs(image_hsv[:, :, 2] - quant_hsv[:, :, 2]))
+        h_diff = np.mean(image_hsv[:, :, 0] - quant_hsv[:, :, 0])
+        s_diff = np.mean(image_hsv[:, :, 1] - quant_hsv[:, :, 1])
+        v_diff = np.mean(image_hsv[:, :, 2] - quant_hsv[:, :, 2])
         return h_diff, s_diff, v_diff

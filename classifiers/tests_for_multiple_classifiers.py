@@ -139,6 +139,14 @@ def load_x_y_from_files(filenames):
 
 
 def save_metrics_to_file(classifiers_metrics, y, y_preds, confusion_matrices, filenames):
+    """
+    Saves couple of metrics to default directory: data/results/.
+    :param classifiers_metrics: array of metrics (accuracy and fscore)
+    :param y: true y values for each picture
+    :param y_preds: y predictions for each classifier
+    :param confusion_matrices: confusion matrices for all classifiers
+    :param filenames: list with names of datasets that where used for counting metrics
+    """
     df_metrics = pd.DataFrame(np.array(classifiers_metrics), columns=['Classifier', 'Accuracy', 'Fscore'])
     df_y = pd.DataFrame(np.hstack([np.array(y).reshape(-1, 1), np.stack(y_preds[:, 1]).T]),
                         columns=['True labels'] + list(y_preds[:, 0]))
