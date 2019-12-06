@@ -20,7 +20,7 @@ class DataSaver():
     def __init__(self, dataset_type):
         # TODO use Łukaszs code to do this, after merge :D
         self.data_type = dataset_type
-        self.path = os.path.join(PROJECT_PATH, 'datasets_pkl')
+        self.path = os.path.join(DATA_PATH, 'datasets_pkl')
 
     def _load_data_from_one_directory(self, label_name):
         path = os.path.join(DATA_PATH, label_name)
