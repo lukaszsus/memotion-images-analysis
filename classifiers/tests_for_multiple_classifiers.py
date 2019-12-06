@@ -133,7 +133,7 @@ def load_x_y_from_files(filenames):
 
 
 if __name__ == "__main__":
-    filenames = ['pics_bilateral_30_50']  # ['pics_bilateral_30_50', 'pics_bilateral_50_40']
+    filenames = ['pics_bilateral_30_50_new', 'pics_bilateral_30_50', 'pics_bilateral_50_40']  # ['pics_bilateral_30_50', 'pics_bilateral_50_40']
     x, y, x_labels, y_labels = load_x_y_from_files(filenames)
 
     classifiers_metrics = run_all_classifiers(x, y, x_labels, y_labels)

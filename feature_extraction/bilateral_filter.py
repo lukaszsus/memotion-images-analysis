@@ -1,5 +1,6 @@
 import numpy as np
 from time import time
+import matplotlib as mpl
 import cv2
 
 
@@ -60,3 +61,13 @@ class BilateralFilter():
 
         factor = n_colors_diff / n_pix
         return factor
+
+    def _transform_to_hsv(self, image):
+        return mpl.colors.rgb_to_hsv(image)
+
+    def h_from_hsv_differences(self, image, bil_image):
+        image_hsv = self._transform_to_hsv(image)
+        quant_hsv = self._transform_to_hsv(bil_image)
+
+        h_diff = np.mean(image_hsv[:, :, 0] - quant_hsv[:, :, 0])
+        return h_diff
