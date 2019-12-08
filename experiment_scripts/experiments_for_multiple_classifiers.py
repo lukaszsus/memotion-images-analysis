@@ -69,7 +69,7 @@ def sklearn_mlp_metrics(x, y, x_labels, y_labels, hn=(64,), activation='relu'):
     return [[label, acc, f1, y_pred_mlp, cm]]
 
 
-def plot_table_of_metrics(classifiers_metrics, dirname, filenames):
+def plot_table_of_metrics(classifiers_metrics, dirname, feature_set_name):
     table = pd.DataFrame(np.array(classifiers_metrics), columns=['Classfier', 'Accuracy', 'F-score'])
     plt.figure(figsize=(7, 2))
 
@@ -80,7 +80,7 @@ def plot_table_of_metrics(classifiers_metrics, dirname, filenames):
     plt.table(cellText=cell_text, colLabels=table.columns, loc='center')
     plt.axis('off')
 
-    datasets_names = '-'.join(filenames)
+    datasets_names = '-'.join(feature_set_name)
 
     path = os.path.join(DATA_PATH, f'results/plots/{dirname}')
     file_name = f'plot_for-{datasets_names}.png'
@@ -165,29 +165,29 @@ def save_cm_to_file(cm: np.ndarray, file_path: str, labels):
     plt.savefig(file_path)
 
 
-def save_cms_to_files(confusion_matrices: list, im_type: str, filenames: list):
+def save_cms_to_files(confusion_matrices: list, im_type: str, feature_set_name: str):
     for cm in confusion_matrices:
         path = os.path.join(DATA_PATH, f'results/plots/{im_type}')
-        datasets_names = '-'.join(filenames)
+        datasets_names = '-'.join(feature_set_name)
         file_name = f'cm_for-{cm[0]}-{datasets_names}.png'
         file_path = os.path.join(path, file_name)
         save_cm_to_file(cm, file_path, y_labels)
 
 
-def save_metrics_to_file(classifiers_metrics, y, y_preds, confusion_matrices, dirname, filenames):
+def save_metrics_to_file(classifiers_metrics, y, y_preds, confusion_matrices, dirname, feature_set_name):
     """
     Saves couple of metrics to default directory: data/results/.
     :param classifiers_metrics: array of metrics (accuracy and fscore)
     :param y: true y values for each picture
     :param y_preds: y predictions for each classifier
     :param confusion_matrices: confusion matrices for all classifiers
-    :param filenames: list with names of datasets that where used for counting metrics
+    :param feature_set_name: list with names of datasets that where used for counting metrics
     """
     df_metrics = pd.DataFrame(np.array(classifiers_metrics), columns=['Classifier', 'Accuracy', 'Fscore'])
     df_y = pd.DataFrame(np.hstack([np.array(y).reshape(-1, 1), np.stack(y_preds[:, 1]).T]),
                         columns=['True labels'] + list(y_preds[:, 0]))
     path = os.path.join(DATA_PATH, f'results/metrics/{dirname}')
-    datasets_names = '-'.join(filenames)
+    datasets_names = '-'.join(feature_set_name)
     file_name = f'metrics_full_for-{datasets_names}.pickle'
 
     with open(os.path.join(path, file_name), "wb") as fout:
@@ -260,15 +260,35 @@ if __name__ == "__main__":
         #  '{}_kmeans_segementator_mean_color_diffs_45',
         #  '{}_kmeans_segementator_mean_color_diffs_55']
     ]
+    
+    features_names = [
+        ['bilateral_filter_h_from_hsv_differences'],
+        ['bilateral_filter_mean_color_diffs'],
+        ['bilateral_filter_n_color_diff'],
+        ['bilateral_filter'],
+        ['color_counter_edges_detector'],
+        ['hsv_analyser_hsv_var'],
+        ['hsv_analyser_saturation_distribution'],
+        ['hsv_analyser_sat_value_distribution'],
+        ['scalar'],
+        ['hsv_analyser'],
+        ['scalar_hsv'],
+        # ['kmeans_hsv'],
+        # ['kmeans_mean'],
+        # ['scalar_hsv_kmeans']
+    ]
+    
     y_labels = ["cartoon", "painting", "photo", "text"]
     for im_type in im_types:
         dirname = im_type + "_feature_binaries"
         y = load_y_from_file(dirname, im_type)
-        for filenames in filenames_list:
+        for i in range(len(filenames_list)):
+            filenames = filenames_list[i]
+            feature_set_name = features_names[i]
             filenames_formatted = format_filenames(filenames, im_type)
             x, x_labels = load_x_y_from_files(dirname, filenames_formatted)
 
             classifiers_metrics, y_preds, confusion_matrices = run_all_classifiers(x, y, x_labels, y_labels)
-            plot_table_of_metrics(classifiers_metrics, im_type, filenames_formatted)
-            save_metrics_to_file(classifiers_metrics, y, y_preds, confusion_matrices, im_type, filenames_formatted)
-            save_cms_to_files(confusion_matrices, im_type, filenames_formatted)
+            plot_table_of_metrics(classifiers_metrics, im_type, feature_set_name)
+            save_metrics_to_file(classifiers_metrics, y, y_preds, confusion_matrices, im_type, feature_set_name)
+            save_cms_to_files(confusion_matrices, im_type, feature_set_name)

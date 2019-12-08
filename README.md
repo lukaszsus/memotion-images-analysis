@@ -30,7 +30,7 @@ Academic project for subject Image and video analysis. It is a part of bigger pr
 │       ├── painting  
 │       ├── photo    
 │       └── text  
-|   ├── rescaled_dataset *jeszcze nie zrobiony*
+│   ├── rescaled_dataset *jeszcze nie zrobiony*
 │   ├── results - *tu zapisywane są wszystkie metryki i obrazki do prezki*
 │       ├── metrics *metrics from experiments*
 │           ├── memes    
