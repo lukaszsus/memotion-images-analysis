@@ -25,12 +25,25 @@ Academic project for subject Image and video analysis. It is a part of bigger pr
 │   ├── tests_for_multiple_classifiers.py  
 
 ├── data  
-│   ├── cartoon  
-│   ├── **datasets_pkl** - *tu zapisywane są wyliczone cechy w .pkl*    
-│   ├── painting  
-│   ├── photo  
-│   ├── **results** - *tu zapisywane są wszystkie metryki i obrazki do prezki*  
-│   └── text  
+│   ├── base_dataset
+│       ├── cartoon      
+│       ├── painting  
+│       ├── photo    
+│       └── text  
+|   ├── rescaled_dataset *jeszcze nie zrobiony*
+│   ├── results - *tu zapisywane są wszystkie metryki i obrazki do prezki*
+│       ├── metrics *metrics from experiments*
+│           ├── memes    
+│           ├── pics       
+│       ├── plots *plots contatining tables and confusion matrices*
+│           ├── memes      
+│           ├── pics    
+│       ├── tables  *tables with average f1 score and accuracy*
+│           ├── memes      
+│           ├── pics  
+|   ├── **memes_feature_binaries** *binarki memes z base_dataset*
+|   ├── **pics_feature_binaries** *binarki pics z base_dataset*
+│   ├── **datasets_pkl** - *tu zapisywane są wyliczone cechy w .pkl*
 
 ├── **data_as_dataset_saver.py** - *tu jest plik do zapisywania cech na brudno (mma)*  
 
@@ -50,7 +63,5 @@ Academic project for subject Image and video analysis. It is a part of bigger pr
 │   ├── dataset_creator.py  
 │   └── test_datasetCreator.py  
 
-├── **results** - *przeniosłabym to do ./data/results do jakiegoś podfolderu może*  
-│   ├── models  
-│   ├── plots  
-│   └── tables  
+├── **results** - *przeniosłabym to do ./data/results do jakiegoś podfolderu może*  \
+    *wywaliłem całkiem, bo nie jest już nam chyba do szczęścia potrzebne*

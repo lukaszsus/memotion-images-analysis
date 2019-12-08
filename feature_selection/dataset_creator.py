@@ -4,6 +4,7 @@ import pickle
 import numpy as np
 import pandas as pd
 from data_loader.utils import load_image_by_cv2
+from deprecated import deprecated
 from feature_extraction.bilateral_filter import BilateralFilter
 from feature_extraction.color_counter import ColorCounter
 from feature_extraction.edges_detector import EdgesDetector
@@ -11,6 +12,7 @@ from feature_extraction.feature_namer import FeatureNamer
 from feature_extraction.hsv_analyser import HsvAnalyser
 
 
+@deprecated(reason="More efficient way implemented in FeatureExtractor class.")
 class DatasetCreator():
     """
     Class creates pandas DataFrame with columns names the same as features names.
@@ -81,6 +83,7 @@ class DatasetCreator():
 
         self.extraction_pipeline = pipeline
 
+    @deprecated(reason="More efficient way implemented in method create features from dir.")
     def create_dataset_from_dir(self, src_path: str):
         """
         Creates dataset from source path (directory) and saves it to dst_path (csv file).

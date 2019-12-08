@@ -1,0 +1,274 @@
+import os
+import pickle as pkl
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+import seaborn as sns
+
+from classifiers.decision_trees import DecisionTree
+from classifiers.k_nearest_neighbours import NearestNeighbours
+from classifiers.naive_bayes import NaiveBayes
+from classifiers.neural_network import NeuralNetwork
+from settings import PROJECT_PATH, DATA_PATH
+
+
+def load_dataset(dirname, filename):
+    dataset_path = os.path.join(DATA_PATH, f'{dirname}/{filename}.pickle')
+    with open(dataset_path, "rb") as f:
+        x = pkl.load(f)
+    return x, [filename] * x.shape[1]
+
+
+def decission_tree_metrics(x, y, x_labels, y_labels, max_depth=3, min_samples_leaf=5, estimators=15):
+    dt = DecisionTree(x, y, x_labels, y_labels, max_depth=max_depth, min_samples_leaf=min_samples_leaf)
+
+    label_tree = 'Decision Tree (CART)'
+    y_pred_tree = dt.crossval_decision_tree()
+    cm_tree = dt.plot_confusion_matrix(y_pred_tree, label=label_tree)
+    dt.show_basic_metrics(y_pred_tree, label=label_tree)
+    tree_acc, tree_f1 = dt.count_basic_metrics(y_pred_tree)
+
+    label_forest = 'Random Forest'
+    y_pred_forest = dt.crossval_random_forest(num_estimators=estimators)
+    cm_forest = dt.plot_confusion_matrix(y_pred_forest, label=label_forest)
+    dt.show_basic_metrics(y_pred_forest, label=label_forest)
+    for_acc, for_f1 = dt.count_basic_metrics(y_pred_forest)
+
+    return [[label_tree, tree_acc, tree_f1, y_pred_tree, cm_tree],
+            [label_forest, for_acc, for_f1, y_pred_forest, cm_forest]]
+
+
+def naive_bayes_metrics(x, y, x_labels, y_labels):
+    nb = NaiveBayes(x, y, x_labels, y_labels)
+
+    label = 'Gaussian Naive Bayes'
+    y_pred = nb.crossval_gaussian_navie_bayes()
+    nb.show_basic_metrics(y_pred, label=label)
+    cm = nb.plot_confusion_matrix(y_pred, label=label)
+    acc, f1 = nb.count_basic_metrics(y_pred)
+    return [[label, acc, f1, y_pred, cm]]
+
+
+def knn_metrics(x, y, x_labels, y_labels, n_neighbours=3):
+    nn = NearestNeighbours(x, y, x_labels, y_labels, n_neigh=n_neighbours)
+    label = 'k Nearest Neighbours'
+    y_pred_knn = nn.crossval_knn()
+    cm = nn.plot_confusion_matrix(y_pred_knn, label=label)
+    nn.show_basic_metrics(y_pred_knn, label=label)
+    acc, f1 = nn.count_basic_metrics(y_pred_knn)
+    return [[label, acc, f1, y_pred_knn, cm]]
+
+
+def sklearn_mlp_metrics(x, y, x_labels, y_labels, hn=(64,), activation='relu'):
+    nn = NeuralNetwork(x, y, x_labels, y_labels, hidden_neurons=hn, activation_fun=activation)
+    label = 'Multilayer Perceptron'
+    y_pred_mlp = nn.crossval_mlp()
+    cm = nn.plot_confusion_matrix(y_pred_mlp, label=label)
+    nn.show_basic_metrics(y_pred_mlp, label=label)
+    acc, f1 = nn.count_basic_metrics(y_pred_mlp)
+    return [[label, acc, f1, y_pred_mlp, cm]]
+
+
+def plot_table_of_metrics(classifiers_metrics, dirname, filenames):
+    table = pd.DataFrame(np.array(classifiers_metrics), columns=['Classfier', 'Accuracy', 'F-score'])
+    plt.figure(figsize=(7, 2))
+
+    cell_text = []
+    for row in range(len(table)):
+        cell_text.append(table.iloc[row])
+
+    plt.table(cellText=cell_text, colLabels=table.columns, loc='center')
+    plt.axis('off')
+
+    datasets_names = '-'.join(filenames)
+
+    path = os.path.join(DATA_PATH, f'results/plots/{dirname}')
+    file_name = f'plot_for-{datasets_names}.png'
+    file_path = os.path.join(path, file_name)
+    plt.savefig(file_path, bbox_inches='tight')
+
+    path = os.path.join(DATA_PATH, f'results/tables/{dirname}')
+    file_name = f'plot_for-{datasets_names}.csv'
+    file_path = os.path.join(path, file_name)
+    table.to_csv(file_path, index=False)
+
+
+def run_all_classifiers(x, y, x_labels, y_labels,
+                        max_depth=3, min_samples_leaf=5, estimators=15, n_neighbours=3, hn=(256,), activation='relu'):
+    """
+    Method that runs all classifiers and returns numpy array with accuracy and f-score for each (with classifier name).
+    :param x: features values read from file
+    :param y: label values (from 0 to 3) read from file
+    :param x_labels: feature names
+    :param y_labels: label names - cartoon, painting, photo and text
+    :param max_depth: CART clf - maximum tree depth
+    :param min_samples_leaf: CART clf - minimum number of samples in one leaf
+    :param estimators: RandomForest clf - number of weak classifiers/trees
+    :param n_neighbours: kNN clf - number of nearest neighbours
+    :param hn: MLP clf - number of hidden layers (as a tuple)
+    :param activation: MLP clf - activation function
+    :return: numpy array of (clf_name, accuracy, f-score), y_predicted and confussion_matrix)
+    """
+
+    naive_bayes = naive_bayes_metrics(x, y, x_labels, y_labels)
+    trees = decission_tree_metrics(x, y, x_labels, y_labels, max_depth, min_samples_leaf, estimators)
+    knn = knn_metrics(x, y, x_labels, y_labels, n_neighbours)
+    nn = sklearn_mlp_metrics(x, y, x_labels, y_labels, hn, activation)
+    classifiers_metrics = np.array(naive_bayes + trees + knn + nn)
+
+    metrics, y_preds, confusion_matrices = classifiers_metrics[:, :-2], \
+                                           classifiers_metrics[:, [0, -2]], \
+                                           classifiers_metrics[:, [0, -1]]
+    metrics[:, 1:] = np.around(np.array(metrics[:, 1:], dtype=np.float32) * 100, 2)
+
+    return metrics, y_preds, confusion_matrices
+
+
+def load_multiple_datasets(dirname, filenames):
+    x_features, x_names = [], []
+    for filename in filenames:
+        x, x_labels = load_dataset(dirname, filename)
+        x_features.append(np.array(x))
+        x_names += [f'{x_label}_{filename}' for x_label in x_labels]
+
+    x_features = np.concatenate(x_features, axis=1)
+    x_features = np.reshape(x_features, (-1, len(x_names)))
+    df = pd.DataFrame(np.array(x_features), columns=x_names)
+
+    return df
+
+
+def load_x_y_from_files(dirname, filenames):
+    df = load_multiple_datasets(dirname, filenames)
+    vals = df.values
+    x_labels = df.columns[:-1]
+    return vals, x_labels
+
+
+def load_y_from_file(dirname, im_type):
+    labels_path = os.path.join(DATA_PATH, f'{dirname}/{im_type}_labels.pickle')
+    with open(labels_path, "rb") as f:
+        y = pkl.load(f)
+    return y
+
+
+def save_cm_to_file(cm: np.ndarray, file_path: str, labels):
+    name = cm[0]
+    cm = cm[1]
+
+    cm = pd.DataFrame(cm, index=labels, columns=labels).round(decimals=2)
+    cm.index.name = 'True labels'
+    cm.columns.name = 'Predicted labels'
+    fig, ax = plt.subplots(figsize=(7, 7))
+    sns.heatmap(cm, cmap="Greens", annot=True, fmt='', ax=ax)
+    ax.set_title("{}".format(name))
+    plt.savefig(file_path)
+
+
+def save_cms_to_files(confusion_matrices: list, im_type: str, filenames: list):
+    for cm in confusion_matrices:
+        path = os.path.join(DATA_PATH, f'results/plots/{im_type}')
+        datasets_names = '-'.join(filenames)
+        file_name = f'cm_for-{cm[0]}-{datasets_names}.png'
+        file_path = os.path.join(path, file_name)
+        save_cm_to_file(cm, file_path, y_labels)
+
+
+def save_metrics_to_file(classifiers_metrics, y, y_preds, confusion_matrices, dirname, filenames):
+    """
+    Saves couple of metrics to default directory: data/results/.
+    :param classifiers_metrics: array of metrics (accuracy and fscore)
+    :param y: true y values for each picture
+    :param y_preds: y predictions for each classifier
+    :param confusion_matrices: confusion matrices for all classifiers
+    :param filenames: list with names of datasets that where used for counting metrics
+    """
+    df_metrics = pd.DataFrame(np.array(classifiers_metrics), columns=['Classifier', 'Accuracy', 'Fscore'])
+    df_y = pd.DataFrame(np.hstack([np.array(y).reshape(-1, 1), np.stack(y_preds[:, 1]).T]),
+                        columns=['True labels'] + list(y_preds[:, 0]))
+    path = os.path.join(DATA_PATH, f'results/metrics/{dirname}')
+    datasets_names = '-'.join(filenames)
+    file_name = f'metrics_full_for-{datasets_names}.pickle'
+
+    with open(os.path.join(path, file_name), "wb") as fout:
+        pkl.dump([df_metrics, df_y, confusion_matrices], fout, protocol=-1)
+
+
+def format_filenames(filenames: list, im_type: str):
+    filenames_formatted = list()
+    for filename in filenames:
+        filenames_formatted.append(filename.format(im_type))
+    return filenames_formatted
+
+
+if __name__ == "__main__":
+    im_types = ["pics", "memes"]
+    filenames_list = [
+        ['{}_bilateral_filter_h_from_hsv_differences'],
+        ['{}_bilateral_filter_mean_color_diffs'],
+        ['{}_bilateral_filter_n_color_diff'],
+        ['{}_bilateral_filter_h_from_hsv_differences',
+         '{}_bilateral_filter_mean_color_diffs',
+         '{}_bilateral_filter_n_color_diff'],
+        ['{}_color_counter_norm_color_count',
+         '{}_edges_detector_grayscale_edges_factor'],
+        ['{}_hsv_analyser_hsv_var'],
+        ['{}_hsv_analyser_saturation_distribution'],
+        ['{}_hsv_analyser_sat_value_distribution'],
+        ['{}_bilateral_filter_h_from_hsv_differences',
+         '{}_bilateral_filter_mean_color_diffs',
+         '{}_bilateral_filter_n_color_diff',
+         '{}_color_counter_norm_color_count',
+         '{}_edges_detector_grayscale_edges_factor'],
+        ['{}_hsv_analyser_hsv_var',
+         '{}_hsv_analyser_saturation_distribution',
+         '{}_hsv_analyser_sat_value_distribution'],
+        ['{}_bilateral_filter_h_from_hsv_differences',
+         '{}_bilateral_filter_mean_color_diffs',
+         '{}_bilateral_filter_n_color_diff',
+         '{}_color_counter_norm_color_count',
+         '{}_edges_detector_grayscale_edges_factor',
+         '{}_hsv_analyser_hsv_var',
+         '{}_hsv_analyser_saturation_distribution',
+         '{}_hsv_analyser_sat_value_distribution'],
+        # ['{}_kmeans_segementator_hsv_differences_15',
+        #  '{}_kmeans_segementator_hsv_differences_25',
+        #  '{}_kmeans_segementator_hsv_differences_35',
+        #  '{}_kmeans_segementator_hsv_differences_45',
+        #  '{}_kmeans_segementator_hsv_differences_55'],
+        # ['{}_kmeans_segementator_mean_color_diffs_15',
+        #  '{}_kmeans_segementator_mean_color_diffs_25',
+        #  '{}_kmeans_segementator_mean_color_diffs_35',
+        #  '{}_kmeans_segementator_mean_color_diffs_45',
+        #  '{}_kmeans_segementator_mean_color_diffs_55'],
+        # ['{}_bilateral_filter_h_from_hsv_differences',
+        #  '{}_bilateral_filter_mean_color_diffs',
+        #  '{}_bilateral_filter_n_color_diff',
+        #  '{}_color_counter_norm_color_count',
+        #  '{}_edges_detector_grayscale_edges_factor',
+        #  '{}_hsv_analyser_hsv_var',
+        #  '{}_hsv_analyser_saturation_distribution',
+        #  '{}_hsv_analyser_sat_value_distribution',
+        #  '{}_kmeans_segementator_hsv_differences_15',
+        #  '{}_kmeans_segementator_hsv_differences_25',
+        #  '{}_kmeans_segementator_hsv_differences_35',
+        #  '{}_kmeans_segementator_hsv_differences_45',
+        #  '{}_kmeans_segementator_hsv_differences_55',
+        #  '{}_kmeans_segementator_mean_color_diffs_15',
+        #  '{}_kmeans_segementator_mean_color_diffs_25',
+        #  '{}_kmeans_segementator_mean_color_diffs_35',
+        #  '{}_kmeans_segementator_mean_color_diffs_45',
+        #  '{}_kmeans_segementator_mean_color_diffs_55']
+    ]
+    y_labels = ["cartoon", "painting", "photo", "text"]
+    for im_type in im_types:
+        dirname = im_type + "_feature_binaries"
+        y = load_y_from_file(dirname, im_type)
+        for filenames in filenames_list:
+            filenames_formatted = format_filenames(filenames, im_type)
+            x, x_labels = load_x_y_from_files(dirname, filenames_formatted)
+
+            classifiers_metrics, y_preds, confusion_matrices = run_all_classifiers(x, y, x_labels, y_labels)
+            plot_table_of_metrics(classifiers_metrics, im_type, filenames_formatted)
+            save_metrics_to_file(classifiers_metrics, y, y_preds, confusion_matrices, im_type, filenames_formatted)
+            save_cms_to_files(confusion_matrices, im_type, filenames_formatted)

@@ -54,7 +54,7 @@ class HsvAnalyser():
         n_bins = self.__parse_n_bins(n_bins)
         distributions = list()
         for n_bin in n_bins:
-            dist, _ = np.histogram(self.saturation, bins=n_bin)
+            dist, _ = np.histogram(self.saturation.flatten(), bins=n_bin)
             # Normalize it manually because I want distribution to sum up to 1.
             # Arguments 'density' and 'normed' in np.histogram does not work like that.
             dist = dist / np.sum(dist)
@@ -75,7 +75,7 @@ class HsvAnalyser():
         if image is not None:
             self.set_image_and_convert_to_hsv(image)
         n_bin = 20 if n_bin is None else n_bin
-        distribution, _s, _v = np.histogram2d(self.saturation, self.values, bins=n_bin)  # density makes normalization
+        distribution, _s, _v = np.histogram2d(self.saturation.flatten(), self.value.flatten(), bins=(n_bin, n_bin))  # density makes normalization
         # Normalize it manually because I want distribution to sum up to 1.
         # Arguments 'density' and 'normed' in np.histogram does not work like that.
         distribution = distribution / np.sum(distribution)
