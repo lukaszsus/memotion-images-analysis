@@ -9,17 +9,16 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 from settings import DATA_PATH
-
 sns.set()
 
 
-def load_datasets_metrics(filename):
+def load_datasets_metrics(filename, default_dir='results/metrics/pics'):
     """
     Loads saved in default directory metrics.
     :param filename: name of file to load
     :return: metrics: dataframe with accuracy and fscore, dataframe with y_preds and confussion matrix
     """
-    path = os.path.join(DATA_PATH, f'results/{filename}')
+    path = os.path.join(DATA_PATH, f'{default_dir}/{filename}')
     with open(path, "rb") as fin:
         df_metrics, df_y, confusion_matrices = pkl.load(fin)
     return df_metrics, df_y, confusion_matrices
@@ -57,7 +56,7 @@ class MetricPlotter():
         Plots barplot with metrics - accuracy and fscore - for each classifier.
         :param df_metrics: dataframe with those metrics
         """
-        sns.set_palette("nipy_spectral")
+        sns.set_palette("rainbow_r")
 
         df = df_metrics.set_index(['Classifier'])
         df.index = df.index.str.wrap(12)
@@ -94,12 +93,12 @@ class MetricPlotter():
 
 
 if __name__ == "__main__":
-    filename = 'metrics_full_for-pics_bilateral_30_50_new-pics_bilateral_30_50-pics_bilateral_50_40.pkl'
-    df_metrics, df_y, confusion_matrices = load_datasets_metrics(filename)
+    filename = 'metrics_full_for-pics_hsv_analyser_sat_value_distribution-without_photo.pkl'
+    df_metrics, df_y, confusion_matrices = load_datasets_metrics(filename, default_dir='results')
 
     mp = MetricPlotter()
     mp.plot_df_metrics(df_metrics)
 
-    classifier = 'Random Forest'
-    mp.plot_wrongly_classified_pictures(df_y, classifier)
+    # classifier = 'Random Forest'
+    # mp.plot_wrongly_classified_pictures(df_y, classifier)
 
