@@ -2,19 +2,22 @@
 Academic project for subject Image and video analysis. It is a part of bigger project called Memotion Analysis.
 
 ---------------
-### TODO
+## TODO
 
-- [Ł] Zmergować kod
-- [M] ~~Dodać MLP, inne klasyfikatory, cross_validation~~
-    * zapisywać wyniki do pliku
-- [Ł] Dodać zapisywanie cech
-    * dodać wersję z przeskalowaniem (tam gdzie konieczne albo wszędzie)
-- [M] ~~Dodać trochę danych treningowych i wysłać Łukaszowi~~
-- [M] Dodać PCA i segmentację kMeansem
-- [M] Dorobić wykresiki (inne niż *confussion matrix*)
+- PCA
+- Skalowanie na zasadzie segmentacji obrazów 
+  (segmentacja, ustandaryzowanie mody histogramu)
+- Zespół klasyfikatorów
+    - cechy klasyfikatorów jako wejście do sieci neuronowej
+- Klasyfikacja z wyodrębnieniem jednej klasy
+- Wykres skuteczności w zależności od wielkości zbioru danych
+- ###Dzielenie danych na podobrazki (badanie struktury)
+    - badanie gradientów wzdłuż pionów i poziomów obrazka
+    - tworzenie bounding boxów
 
 
-### Drzewo katalogów (wybrane foldery)
+
+## Drzewo katalogów (wybrane foldery)
 
 ├── classifiers   
 │   ├── base_classifier.py  
@@ -30,20 +33,20 @@ Academic project for subject Image and video analysis. It is a part of bigger pr
 │       ├── painting  
 │       ├── photo    
 │       └── text  
-│   ├── rescaled_dataset *jeszcze nie zrobiony*
-│   ├── results - *tu zapisywane są wszystkie metryki i obrazki do prezki*
-│       ├── metrics *metrics from experiments*
-│           ├── memes    
+│   ├── rescaled_dataset *jeszcze nie zrobiony*  
+│   ├── results - *tu zapisywane są wszystkie metryki i obrazki do prezki*  
+│       ├── metrics *metrics from experiments*  
+│           ├── memes      
 │           ├── pics       
-│       ├── plots *plots contatining tables and confusion matrices*
+│       ├── plots *plots contatining tables and confusion matrices*  
 │           ├── memes      
 │           ├── pics    
-│       ├── tables  *tables with average f1 score and accuracy*
+│       ├── tables  *tables with average f1 score and accuracy*  
 │           ├── memes      
 │           ├── pics  
-|   ├── **memes_feature_binaries** *binarki memes z base_dataset*
-|   ├── **pics_feature_binaries** *binarki pics z base_dataset*
-│   ├── **datasets_pkl** - *tu zapisywane są wyliczone cechy w .pkl*
+|   ├── **memes_feature_binaries** *binarki memes z base_dataset*  
+|   ├── **pics_feature_binaries** *binarki pics z base_dataset*  
+│   ├── **datasets_pkl** - *tu zapisywane są wyliczone cechy w .pkl*  
 
 ├── **data_as_dataset_saver.py** - *tu jest plik do zapisywania cech na brudno (mma)*  
 
@@ -62,6 +65,3 @@ Academic project for subject Image and video analysis. It is a part of bigger pr
 ├── feature_selection  
 │   ├── dataset_creator.py  
 │   └── test_datasetCreator.py  
-
-├── **results** - *przeniosłabym to do ./data/results do jakiegoś podfolderu może*  \
-    *wywaliłem całkiem, bo nie jest już nam chyba do szczęścia potrzebne*
