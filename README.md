@@ -75,6 +75,3 @@ Academic project for subject Image and video analysis. It is a part of bigger pr
 ├── feature_selection  
 │   ├── dataset_creator.py  
 │   └── test_datasetCreator.py  
-
-├── **results** - *przeniosłabym to do ./data/results do jakiegoś podfolderu może*  \
-    *wywaliłem całkiem, bo nie jest już nam chyba do szczęścia potrzebne*
