@@ -53,12 +53,12 @@ class TestHsvAnalyser(TestCase):
         self.assertTrue(True)
 
     def test_sat_value_distribution(self):
-        file_photo = os.path.join(DATA_PATH, "photo")
+        file_photo = os.path.join(DATA_PATH, "base_dataset/photo")
         file_photo = os.path.join(file_photo, "funny-game-of-thrones-memes-fb__700.jpg")
         im_photo = load_image_as_array(file_photo)
         print(im_photo.shape)
 
-        file_paint = os.path.join(DATA_PATH, "painting")
+        file_paint = os.path.join(DATA_PATH, "base_dataset/painting")
         file_paint = os.path.join(file_paint, "5d646e19b30e1.jpeg")
         im_paint = load_image_as_array(file_paint)
         print(im_paint.shape)

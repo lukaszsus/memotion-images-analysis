@@ -82,6 +82,7 @@ class BaseClassifier():
         fig.tight_layout()
         plt.grid(False)
         plt.show()
+        return cm
 
     def count_basic_metrics(self, y_pred, y_test=None, f1_type='macro'):
         """

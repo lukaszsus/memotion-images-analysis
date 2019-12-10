@@ -1,7 +1,9 @@
 .idea
 __pycache__
 user_settings.py
+
 data/
+
 venv/
 results/
 

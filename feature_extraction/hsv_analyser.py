@@ -1,7 +1,8 @@
 import colorsys
-
+import matplotlib.pyplot as plt
 import matplotlib
 import numpy as np
+import seaborn as sns
 
 
 class HsvAnalyser():
@@ -54,7 +55,7 @@ class HsvAnalyser():
         n_bins = self.__parse_n_bins(n_bins)
         distributions = list()
         for n_bin in n_bins:
-            dist, _ = np.histogram(self.saturation, bins=n_bin)
+            dist, _ = np.histogram(self.saturation.flatten(), bins=n_bin)
             # Normalize it manually because I want distribution to sum up to 1.
             # Arguments 'density' and 'normed' in np.histogram does not work like that.
             dist = dist / np.sum(dist)
@@ -75,7 +76,7 @@ class HsvAnalyser():
         if image is not None:
             self.set_image_and_convert_to_hsv(image)
         n_bin = 20 if n_bin is None else n_bin
-        distribution, _s, _v = np.histogram2d(self.saturation, self.values, bins=n_bin)  # density makes normalization
+        distribution, _s, _v = np.histogram2d(self.saturation.flatten(), self.value.flatten(), bins=(n_bin, n_bin))  # density makes normalization
         # Normalize it manually because I want distribution to sum up to 1.
         # Arguments 'density' and 'normed' in np.histogram does not work like that.
         distribution = distribution / np.sum(distribution)
@@ -101,3 +102,25 @@ class HsvAnalyser():
         elif type(n_bins) != list:
             n_bins = [n_bins]
         return n_bins
+
+    def _sat_value_distribution_features_for_plots(self, image=None, n_bin=None):
+        if image is not None:
+            self.set_image_and_convert_to_hsv(image)
+        n_bin = 20 if n_bin is None else n_bin
+        distribution, _s, _v = np.histogram2d(self.saturation.flatten(), self.value.flatten(), bins=(n_bin, n_bin))
+        return distribution.T, _s, _v, self.saturation.flatten(), self.value.flatten()
+
+    def sat_value_distribution_plots(self, im_photo):
+        dist_photo, s_ph, v_ph, sat_ph, val_ph = self._sat_value_distribution_features_for_plots(im_photo)
+
+        sns.set_palette('Accent_r')
+        sns.distplot(sat_ph, label='saturation', bins=20)
+        sns.distplot(val_ph, label='value', bins=20)
+        plt.legend()
+        plt.show()
+
+        plt.figure(figsize=(6, 6))
+        plt.imshow(dist_photo, interpolation='nearest', origin='low', extent=[s_ph[0], s_ph[-1], v_ph[0], v_ph[-1]])
+        plt.grid(False)
+        plt.axis('off')
+        plt.show()

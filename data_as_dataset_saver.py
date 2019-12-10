@@ -20,7 +20,7 @@ class DataSaver():
     def __init__(self, dataset_type):
         # TODO use Łukaszs code to do this, after merge :D
         self.data_type = dataset_type
-        self.path = os.path.join(PROJECT_PATH, 'datasets_pkl')
+        self.path = os.path.join(DATA_PATH, 'datasets_pkl')
 
     def _load_data_from_one_directory(self, label_name):
         path = os.path.join(DATA_PATH, label_name)
@@ -35,12 +35,12 @@ class DataSaver():
 
     def _get_dataset_from_one_directory(self, label_name, images_cv2):
         ''' FEATURES '''
-        bf = BilateralFilter(50, 40, 40)
+        bf = BilateralFilter(30, 50, 50)
         x_data, y_data = [], [LABELS.index(label_name) for _ in images_cv2]
         for i, image in enumerate(images_cv2):
             x_data.append([])
             bil_image = bf.apply_filter(image)
-            x_data[i].append(bf.mean_color_diffs(images_cv2[i], bil_image))
+            x_data[i].append(bf.h_from_hsv_differences(images_cv2[i], bil_image))
             x_data[i].append(bf.n_color_diff(images_cv2[i], bil_image))
 
         return x_data, y_data
@@ -56,7 +56,7 @@ class DataSaver():
             y += y_data
             print(f'  finishing after {round(time() - t, 3)} seconds')
 
-        x_feature_names = ['bilateral_mean_color_diff', 'bilateral_norm_color_diff']
+        x_feature_names = ['bilateral_h_hsv_diff', 'bilateral_norm_color_diff']
         return x, y, x_feature_names, LABELS
 
     def save_dataset_to_file(self, x, y, x_feature_names, y_feature_names, dataset_name):

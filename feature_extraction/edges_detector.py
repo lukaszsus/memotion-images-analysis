@@ -40,3 +40,23 @@ class EdgesDetector():
             proportions.append(n_pix_edges_gray / n_pix_edges_color)
 
         return np.array(proportions)
+
+    def _grayscale_edges_factor_features_for_plots(self, image):
+        im_color = np.uint8(image)
+        im_gray = np.uint8(np.dot(image[..., :3], [0.299, 0.587, 0.114]))
+
+        colors, grays = [], []
+        for threshold in self.thresholds:
+            edges_color = cv2.Canny(im_color, *threshold)      # arbitrary chosen thresholds
+            edges_gray = cv2.Canny(im_gray, *threshold)
+
+            colors.append(edges_color)
+            grays.append(edges_gray)
+
+        return colors, grays
+
+    def grayscale_edges_factor_color_plots(self, im_photo, threshold_index=3):
+        colors, grays = self._grayscale_edges_factor_features_for_plots(im_photo)
+        plt.imshow(colors[threshold_index], cmap='gray')
+        plt.xticks([]), plt.yticks([])
+        plt.show()
