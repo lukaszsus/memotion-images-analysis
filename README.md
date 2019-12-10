@@ -2,15 +2,18 @@
 Academic project for subject Image and video analysis. It is a part of bigger project called Memotion Analysis.
 
 ---------------
-### TODO
+## TODO
 
-- [Ł] ~~Zmergować kod~~
-- [M] ~~Dodać MLP, inne klasyfikatory, cross_validation~~
-    * zapisywać wyniki do pliku
-- [Ł] ~~Dodać zapisywanie cech~~
-    * dodać wersję z przeskalowaniem (tam gdzie konieczne albo wszędzie)
-- [M] ~~Dodać trochę danych treningowych i wysłać Łukaszowi~~
-- [M] Dorobić wykresiki (inne niż *confussion matrix*)
+- PCA
+- Skalowanie na zasadzie segmentacji obrazów 
+  (segmentacja, ustandaryzowanie mody histogramu)
+- Zespół klasyfikatorów
+    - cechy klasyfikatorów jako wejście do sieci neuronowej
+- Klasyfikacja z wyodrębnieniem jednej klasy
+- Wykres skuteczności w zależności od wielkości zbioru danych
+- ###Dzielenie danych na podobrazki (badanie struktury)
+    - badanie gradientów wzdłuż pionów i poziomów obrazka
+    - tworzenie bounding boxów
 
 - [Ł] ~~Połączyć memes i pics i zbadać zależność wyników od rozmiaru~~
 - [Ł] ~~Zrobić PCA~~
@@ -23,7 +26,8 @@ Academic project for subject Image and video analysis. It is a part of bigger pr
 - [M] Sprawdzić brutal force dla separacji obrazów połączonych - np. znaleźć gwałtowną zmianę gradientu
 
 
-### Drzewo katalogów (wybrane foldery)
+
+## Drzewo katalogów (wybrane foldery)
 
 ├── classifiers   
 │   ├── base_classifier.py  
