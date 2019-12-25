@@ -89,7 +89,7 @@ def plot_table_of_metrics(classifiers_metrics, dirname, feature_set_name):
     plt.savefig(file_path, bbox_inches='tight')
 
     path = os.path.join(DATA_PATH, f'results/tables/{dirname}')
-    file_name = f'plot_for-{datasets_names}.csv'
+    file_name = f'table_for-{datasets_names}.csv'
     file_path = os.path.join(path, file_name)
     table.to_csv(file_path, index=False)
 
@@ -166,7 +166,7 @@ def save_cm_to_file(cm: np.ndarray, file_path: str, labels):
     plt.savefig(file_path)
 
 
-def save_cms_to_files(confusion_matrices: list, im_type: str, feature_set_name: str):
+def save_cms_to_files(confusion_matrices: list, im_type: str, feature_set_name: str, y_labels):
     for cm in confusion_matrices:
         path = os.path.join(DATA_PATH, f'results/plots/{im_type}')
         datasets_names = '-'.join(feature_set_name)
@@ -328,4 +328,4 @@ if __name__ == "__main__":
                 plot_table_of_metrics(classifiers_metrics, im_type_stand, feature_set_name)
                 save_metrics_to_file(classifiers_metrics, y, y_preds, confusion_matrices, im_type_stand,
                                      feature_set_name)
-                save_cms_to_files(confusion_matrices, im_type_stand, feature_set_name)
+                save_cms_to_files(confusion_matrices, im_type_stand, feature_set_name, y_labels)

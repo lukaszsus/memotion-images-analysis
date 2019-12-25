@@ -4,14 +4,22 @@ Academic project for subject Image and video analysis. It is a part of bigger pr
 ---------------
 ### TODO
 
-- [Ł] Zmergować kod
+- [Ł] ~~Zmergować kod~~
 - [M] ~~Dodać MLP, inne klasyfikatory, cross_validation~~
     * zapisywać wyniki do pliku
-- [Ł] Dodać zapisywanie cech
+- [Ł] ~~Dodać zapisywanie cech~~
     * dodać wersję z przeskalowaniem (tam gdzie konieczne albo wszędzie)
 - [M] ~~Dodać trochę danych treningowych i wysłać Łukaszowi~~
-- [M] Dodać PCA i segmentację kMeansem
 - [M] Dorobić wykresiki (inne niż *confussion matrix*)
+
+- [Ł] Połączyć memes i pics i zbadać zależność wyników od rozmiaru
+- [M] Zrobić PCA
+- [Ł] Zrobić klasyfikator złożony, który zrobi klasyfikację na podstawie klasyfikacji innych klasyfikatorów.
+- [Ł] Zrobić filtry Gabora lub inną cechę częstotliwościową.
+
+- [Ł] Wygenerować sztuczny zbiór obrazów połączonych
+- [M] Sprawdzić brutal force dla separacji obrazów połączonych
+- [M] Sprawdzić coś innego dla obrazów połączonych - np. gwałtowną zmianę gradientu
 
 
 ### Drzewo katalogów (wybrane foldery)
