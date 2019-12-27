@@ -9,14 +9,14 @@ from experiment_scripts.experiments_for_multiple_classifiers import load_y_from_
 from settings import DATA_PATH
 
 
-def save_x_to_file(dirname, filename, x):
-    dataset_path = os.path.join(DATA_PATH, f'{dirname}/{filename}.pickle')
+def save_x_to_file(dirname, im_type, filename, x):
+    dataset_path = os.path.join(DATA_PATH, f'{dirname}/{im_type}_{filename}.pickle')
     with open(dataset_path, 'wb') as f:
         pkl.dump(x, f)
 
 
-def save_y_to_file(dirname, y):
-    dataset_path = os.path.join(DATA_PATH, f'{dirname}/labels.pickle')
+def save_y_to_file(dirname, im_type, y):
+    dataset_path = os.path.join(DATA_PATH, f'{dirname}/{im_type}_labels.pickle')
     with open(dataset_path, 'wb') as f:
         pkl.dump(y, f)
 
@@ -36,14 +36,15 @@ def shuffle_x_y(x, y):
     return x[p], y[p]
 
 
-def load_labels_from_file(dirname):
-    labels_path = os.path.join(DATA_PATH, f'{dirname}/labels.pickle')
-    with open(labels_path, "rb") as f:
-        y = pkl.load(f)
-    return y
+# def load_labels_from_file(dirname):
+#     labels_path = os.path.join(DATA_PATH, f'{dirname}/labels.pickle')
+#     with open(labels_path, "rb") as f:
+#         y = pkl.load(f)
+#     return y
 
 
 def create_combined_features(filenames_list, features_names, im_types):
+    out_im_type = "combined"
     for i in range(len(filenames_list)):
         x_list = list()
         y_list = list()
@@ -69,20 +70,18 @@ def create_combined_features(filenames_list, features_names, im_types):
         print(y.shape)
         print()
 
-        dirname = "combined_feature_binaries"
+        dirname = out_im_type + "_feature_binaries"
         feature_set_name = features_names[i][0]
-        x, y = shuffle_x_y(x, y)
-        save_x_to_file(dirname, feature_set_name, x)
-        save_y_to_file(dirname, y)
+        save_x_to_file(dirname, out_im_type, feature_set_name, x)
+        save_y_to_file(dirname, out_im_type, y)
 
 
-def experiments_on_dataset_size(features_names, dataset_sizes, stands, y_labels):
-    im_type = "combined"
-    dirname = "combined_feature_binaries"
-    y_all = load_labels_from_file(dirname)
+def experiments_on_dataset_size(features_names, dataset_sizes, stands, im_type, y_labels):
+    dirname = im_type + "_feature_binaries"
     for i in range(len(features_names)):
+        y_all = load_y_from_file(dirname, im_type)
         feature_set_name = features_names[i]
-        x_all, x_labels = load_x_y_from_files(dirname, feature_set_name)
+        x_all, x_labels = load_x_y_from_files(dirname, [im_type + "_" + feature_set_name[0]])
 
         accuracies = {"Dataset Size": list(),
                       "Gaussian Naive Bayes": list(),
@@ -93,10 +92,12 @@ def experiments_on_dataset_size(features_names, dataset_sizes, stands, y_labels)
 
         f1_scores = {"Dataset Size": list(),
                      "Gaussian Naive Bayes": list(),
-                      "Decision Tree (CART)": list(),
-                      "Random Forest": list(),
-                      "k Nearest Neighbours": list(),
+                     "Decision Tree (CART)": list(),
+                     "Random Forest": list(),
+                     "k Nearest Neighbours": list(),
                      "Multilayer Perceptron": list()}
+
+        x_all, y_all = shuffle_x_y(x_all, y_all)
 
         for stand in stands:
             for ds_size in dataset_sizes:
@@ -124,7 +125,8 @@ def experiments_on_dataset_size(features_names, dataset_sizes, stands, y_labels)
                 plot_table_of_metrics(classifiers_metrics, im_type_stand, [feature_set_name[0] + "-" + str(ds_size)])
                 save_metrics_to_file(classifiers_metrics, y, y_preds, confusion_matrices, im_type_stand,
                                      [feature_set_name[0] + "-" + str(ds_size)])
-                save_cms_to_files(confusion_matrices, im_type_stand, [feature_set_name[0] + "-" + str(ds_size)], y_labels)
+                save_cms_to_files(confusion_matrices, im_type_stand, [feature_set_name[0] + "-" + str(ds_size)],
+                                  y_labels)
 
             df_acc = pd.DataFrame(accuracies)
             df_f1 = pd.DataFrame(f1_scores)
@@ -134,84 +136,138 @@ def experiments_on_dataset_size(features_names, dataset_sizes, stands, y_labels)
 
 if __name__ == "__main__":
     filenames_list = [
-        ['{}_bilateral_filter_h_from_hsv_differences',
-         '{}_bilateral_filter_mean_color_diffs',
-         '{}_bilateral_filter_n_color_diff'],
-        ['{}_color_counter_norm_color_count',
-         '{}_edges_detector_grayscale_edges_factor'],
-        ['{}_hsv_analyser_hsv_var'],
-        ['{}_hsv_analyser_saturation_distribution'],
-        ['{}_hsv_analyser_sat_value_distribution'],
-        ['{}_bilateral_filter_h_from_hsv_differences',
-         '{}_bilateral_filter_mean_color_diffs',
-         '{}_bilateral_filter_n_color_diff',
-         '{}_color_counter_norm_color_count',
-         '{}_edges_detector_grayscale_edges_factor'],
-        ['{}_hsv_analyser_hsv_var',
-         '{}_hsv_analyser_saturation_distribution',
-         '{}_hsv_analyser_sat_value_distribution'],
+        # ['{}_bilateral_filter_h_from_hsv_differences',
+        #  '{}_bilateral_filter_mean_color_diffs',
+        #  '{}_bilateral_filter_n_color_diff'],
+        # ['{}_color_counter_norm_color_count',
+        #  '{}_edges_detector_grayscale_edges_factor'],
+        # ['{}_hsv_analyser_hsv_var'],
+        # ['{}_hsv_analyser_saturation_distribution'],
+        # ['{}_hsv_analyser_sat_value_distribution'],
+        # ['{}_bilateral_filter_h_from_hsv_differences',
+        #  '{}_bilateral_filter_mean_color_diffs',
+        #  '{}_bilateral_filter_n_color_diff',
+        #  '{}_color_counter_norm_color_count',
+        #  '{}_edges_detector_grayscale_edges_factor'],
+        # ['{}_hsv_analyser_hsv_var',
+        #  '{}_hsv_analyser_saturation_distribution',
+        #  '{}_hsv_analyser_sat_value_distribution'],
+        # ['{}_bilateral_filter_h_from_hsv_differences',
+        #  '{}_bilateral_filter_mean_color_diffs',
+        #  '{}_bilateral_filter_n_color_diff',
+        #  '{}_color_counter_norm_color_count',
+        #  '{}_edges_detector_grayscale_edges_factor',
+        #  '{}_hsv_analyser_hsv_var',
+        #  '{}_hsv_analyser_saturation_distribution',
+        #  '{}_hsv_analyser_sat_value_distribution'],
+        # ['{}_bilateral_filter_h_from_hsv_differences',
+        #  '{}_bilateral_filter_mean_color_diffs',
+        #  '{}_bilateral_filter_n_color_diff',
+        #  '{}_color_counter_norm_color_count',
+        #  '{}_edges_detector_grayscale_edges_factor',
+        #  '{}_hsv_analyser_hsv_var',
+        #  '{}_hsv_analyser_saturation_distribution',
+        #  '{}_hsv_analyser_sat_value_distribution',
+        #  '{}_kmeans_segementator_hsv_differences_15',
+        #  '{}_kmeans_segementator_hsv_differences_25',
+        #  '{}_kmeans_segementator_hsv_differences_35',
+        #  '{}_kmeans_segementator_hsv_differences_45',
+        #  '{}_kmeans_segementator_hsv_differences_55',
+        #  '{}_kmeans_segementator_mean_color_diffs_15',
+        #  '{}_kmeans_segementator_mean_color_diffs_25',
+        #  '{}_kmeans_segementator_mean_color_diffs_35',
+        #  '{}_kmeans_segementator_mean_color_diffs_45',
+        #  '{}_kmeans_segementator_mean_color_diffs_55'],
+        # ['{}_bilateral_filter_h_from_hsv_differences',
+        #  '{}_bilateral_filter_mean_color_diffs',
+        #  '{}_bilateral_filter_n_color_diff',
+        #  '{}_color_counter_norm_color_count',
+        #  '{}_edges_detector_grayscale_edges_factor',
+        #  '{}_hsv_analyser_hsv_var',
+        #  '{}_hsv_analyser_saturation_distribution',
+        #  '{}_hsv_analyser_sat_value_distribution',
+        #  '{}_kmeans_segementator_hsv_differences_3',
+        #  '{}_kmeans_segementator_hsv_differences_6',
+        #  '{}_kmeans_segementator_hsv_differences_9',
+        #  '{}_kmeans_segementator_hsv_differences_12',
+        #  '{}_kmeans_segementator_mean_color_diffs_3',
+        #  '{}_kmeans_segementator_mean_color_diffs_6',
+        #  '{}_kmeans_segementator_mean_color_diffs_9',
+        #  '{}_kmeans_segementator_mean_color_diffs_12'],
+        # ['{}_gabor_filter'],
+        # ['{}_bilateral_filter_h_from_hsv_differences',
+        #  '{}_bilateral_filter_mean_color_diffs',
+        #  '{}_bilateral_filter_n_color_diff',
+        #  '{}_color_counter_norm_color_count',
+        #  '{}_edges_detector_grayscale_edges_factor',
+        #  '{}_gabor_filter'],
+        # ['{}_bilateral_filter_h_from_hsv_differences',
+        #  '{}_bilateral_filter_mean_color_diffs',
+        #  '{}_bilateral_filter_n_color_diff',
+        #  '{}_color_counter_norm_color_count',
+        #  '{}_edges_detector_grayscale_edges_factor',
+        #  '{}_hsv_analyser_hsv_var',
+        #  '{}_hsv_analyser_saturation_distribution',
+        #  '{}_hsv_analyser_sat_value_distribution',
+        #  '{}_gabor_filter'],
+        # ['{}_bilateral_filter_h_from_hsv_differences',
+        #  '{}_bilateral_filter_mean_color_diffs',
+        #  '{}_bilateral_filter_n_color_diff',
+        #  '{}_color_counter_norm_color_count',
+        #  '{}_edges_detector_grayscale_edges_factor',
+        #  '{}_hsv_analyser_hsv_var',
+        #  '{}_hsv_analyser_saturation_distribution',
+        #  '{}_hsv_analyser_sat_value_distribution',
+        #  '{}_kmeans_segementator_hsv_differences_15',
+        #  '{}_kmeans_segementator_hsv_differences_25',
+        #  '{}_kmeans_segementator_hsv_differences_35',
+        #  '{}_kmeans_segementator_hsv_differences_45',
+        #  '{}_kmeans_segementator_hsv_differences_55',
+        #  '{}_kmeans_segementator_mean_color_diffs_15',
+        #  '{}_kmeans_segementator_mean_color_diffs_25',
+        #  '{}_kmeans_segementator_mean_color_diffs_35',
+        #  '{}_kmeans_segementator_mean_color_diffs_45',
+        #  '{}_kmeans_segementator_mean_color_diffs_55',
+        #  '{}_gabor_filter']
         ['{}_bilateral_filter_h_from_hsv_differences',
          '{}_bilateral_filter_mean_color_diffs',
          '{}_bilateral_filter_n_color_diff',
          '{}_color_counter_norm_color_count',
          '{}_edges_detector_grayscale_edges_factor',
-         '{}_hsv_analyser_hsv_var',
-         '{}_hsv_analyser_saturation_distribution',
-         '{}_hsv_analyser_sat_value_distribution'],
-        ['{}_bilateral_filter_h_from_hsv_differences',
-         '{}_bilateral_filter_mean_color_diffs',
-         '{}_bilateral_filter_n_color_diff',
-         '{}_color_counter_norm_color_count',
-         '{}_edges_detector_grayscale_edges_factor',
-         '{}_hsv_analyser_hsv_var',
-         '{}_hsv_analyser_saturation_distribution',
-         '{}_hsv_analyser_sat_value_distribution',
          '{}_kmeans_segementator_hsv_differences_15',
          '{}_kmeans_segementator_hsv_differences_25',
          '{}_kmeans_segementator_hsv_differences_35',
          '{}_kmeans_segementator_hsv_differences_45',
          '{}_kmeans_segementator_hsv_differences_55',
-         '{}_kmeans_segementator_mean_color_diffs_15',
-         '{}_kmeans_segementator_mean_color_diffs_25',
-         '{}_kmeans_segementator_mean_color_diffs_35',
-         '{}_kmeans_segementator_mean_color_diffs_45',
-         '{}_kmeans_segementator_mean_color_diffs_55'],
-        ['{}_bilateral_filter_h_from_hsv_differences',
-         '{}_bilateral_filter_mean_color_diffs',
-         '{}_bilateral_filter_n_color_diff',
-         '{}_color_counter_norm_color_count',
-         '{}_edges_detector_grayscale_edges_factor',
-         '{}_hsv_analyser_hsv_var',
-         '{}_hsv_analyser_saturation_distribution',
-         '{}_hsv_analyser_sat_value_distribution',
-         '{}_kmeans_segementator_hsv_differences_3',
-         '{}_kmeans_segementator_hsv_differences_6',
-         '{}_kmeans_segementator_hsv_differences_9',
-         '{}_kmeans_segementator_hsv_differences_12',
-         '{}_kmeans_segementator_mean_color_diffs_3',
-         '{}_kmeans_segementator_mean_color_diffs_6',
-         '{}_kmeans_segementator_mean_color_diffs_9',
-         '{}_kmeans_segementator_mean_color_diffs_12'],
+         '{}_gabor_filter']
     ]
 
     features_names = [
-        ['bilateral_filter'],
-        ['color_counter_edges_detector'],
-        ['hsv_analyser_hsv_var'],
-        ['hsv_analyser_saturation_distribution'],
-        ['hsv_analyser_sat_value_distribution'],
-        ['scalar'],
-        ['hsv_analyser'],
-        ['scalar_hsv'],
-        ['scalar_hsv_kmeans'],
-        ['scalar_hsv_kmeans3']
+        # ['bilateral_filter'],
+        # ['color_counter_edges_detector'],
+        # ['hsv_analyser_hsv_var'],
+        # ['hsv_analyser_saturation_distribution'],
+        # ['hsv_analyser_sat_value_distribution'],
+        # ['scalar'],
+        # ['hsv_analyser'],
+        # ['scalar_hsv'],
+        # ['scalar_hsv_kmeans'],
+        # ['scalar_hsv_kmeans3'],
+        # ['gabor_filter'],
+        # ['scalar_gabor'],
+        # ['scalar_hsv_gabor'],
+        # ['scalar_hsv_kmeans_gabor'],
+        ['scalar_kmeans_gabor']
     ]
 
-    dataset_sizes = [150, 300, 450, 608]
+    dataset_sizes = [150, 300, 450, 608]  # combined
+    # dataset_sizes = [120, 240, 363]             # memes
 
     y_labels = ["cartoon", "painting", "photo", "text"]
     im_types = ["pics", "memes"]
+    # im_types = ["memes"]
     stands = [True, False]
+    im_type = "combined"
 
-    # create_combined_features(filenames_list, features_names, im_types)
-    experiments_on_dataset_size(features_names, dataset_sizes, stands, y_labels)
+    create_combined_features(filenames_list, features_names, im_types)
+    experiments_on_dataset_size(features_names, dataset_sizes, stands, im_type, y_labels)

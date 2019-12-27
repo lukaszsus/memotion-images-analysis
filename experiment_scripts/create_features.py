@@ -44,7 +44,8 @@ if __name__ == '__main__':
     source_path = os.path.join(DATA_PATH, args.source_path) \
         if args.source_path is not None else os.path.join(DATA_PATH, "test_dataset")
     type = args.type if args.type is not None else "pics"
-    dst_path = os.path.join(DATA_PATH, args.dst_path) if args.type is not None else os.path.join(DATA_PATH, "test_pics_feature_binaries")
+    dst_path = os.path.join(DATA_PATH, args.dst_path) if args.type is not None \
+        else os.path.join(DATA_PATH, "test_pics_feature_binaries")
 
     feature_extractor = FeatureExtractor()
     feature_extractor.create_features_from_dir(src_path=source_path,

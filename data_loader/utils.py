@@ -42,7 +42,7 @@ def load_image_by_cv2(file_path):
     :param file_path:
     :return: image as numpy array
     """
-    file_path = file_path.replace(DATA_PATH, "")
+    file_path = file_path.replace(DATA_PATH, ".")
     path = os.path.join(DATA_PATH, file_path)
     img = cv2.imread(path)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)

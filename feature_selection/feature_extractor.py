@@ -7,6 +7,7 @@ from data_loader.utils import load_image_by_cv2
 from feature_extraction.bilateral_filter import BilateralFilter
 from feature_extraction.color_counter import ColorCounter
 from feature_extraction.edges_detector import EdgesDetector
+from feature_extraction.gabor_filter import GaborFilter
 from feature_extraction.hsv_analyser import HsvAnalyser
 from feature_extraction.kmeans_segmentator import KMeansSegmentator
 from functools import partial
@@ -23,6 +24,7 @@ class FeatureExtractor():
         self.edges_detector: EdgesDetector = None
         self.hsv_analyser: HsvAnalyser = None
         self.kmeans_segementator = None
+        self.gabor_filter = None
 
         self.extraction_pipelines: list = None
         self.feature_names: list = None
@@ -198,6 +200,7 @@ class FeatureExtractor():
         self.edges_detector = EdgesDetector()
         self.hsv_analyser = HsvAnalyser()
         self.kmeans_segementator = None
+        self.gabor_filter = GaborFilter()
 
         _kmeans_mean_color_diffs_3 = partial(self._kmeans_segmentator_mean_color_diffs, n_colors=3)
         _kmeans_mean_color_diffs_6 = partial(self._kmeans_segmentator_mean_color_diffs, n_colors=6)
@@ -220,61 +223,63 @@ class FeatureExtractor():
         _kmeans_mean_hsv_diffs_55 = partial(self._kmeans_segmentator_hsv_differences, n_colors=55)
 
         self.extraction_pipelines = [
-            self._basic_method_wrapper(self.bilateral_filter.mean_color_diffs),
-            self._basic_method_wrapper(self.bilateral_filter.n_color_diff),
-            self._basic_method_wrapper(self.bilateral_filter.h_from_hsv_differences),
-            self._basic_method_wrapper(self.color_counter.norm_color_count),
-            self._basic_method_wrapper(self.edges_detector.grayscale_edges_factor),
-            self._basic_method_wrapper(self.hsv_analyser.hsv_var),
-            self._basic_method_wrapper(self.hsv_analyser.saturation_distribution),
-            self._basic_method_wrapper(self.hsv_analyser.sat_value_distribution),
-            _kmeans_mean_color_diffs_15,
-            _kmeans_mean_color_diffs_25,
-            _kmeans_mean_color_diffs_35,
-            _kmeans_mean_color_diffs_45,
-            _kmeans_mean_color_diffs_55,
-            _kmeans_mean_hsv_diffs_15,
-            _kmeans_mean_hsv_diffs_25,
-            _kmeans_mean_hsv_diffs_35,
-            _kmeans_mean_hsv_diffs_45,
-            _kmeans_mean_hsv_diffs_55,
-            _kmeans_mean_color_diffs_3,
-            _kmeans_mean_color_diffs_6,
-            _kmeans_mean_color_diffs_9,
-            _kmeans_mean_color_diffs_12,
-            _kmeans_mean_hsv_diffs_3,
-            _kmeans_mean_hsv_diffs_6,
-            _kmeans_mean_hsv_diffs_9,
-            _kmeans_mean_hsv_diffs_12,
+            # self._basic_method_wrapper(self.bilateral_filter.mean_color_diffs),
+            # self._basic_method_wrapper(self.bilateral_filter.n_color_diff),
+            # self._basic_method_wrapper(self.bilateral_filter.h_from_hsv_differences),
+            # self._basic_method_wrapper(self.color_counter.norm_color_count),
+            # self._basic_method_wrapper(self.edges_detector.grayscale_edges_factor),
+            # self._basic_method_wrapper(self.hsv_analyser.hsv_var),
+            # self._basic_method_wrapper(self.hsv_analyser.saturation_distribution),
+            # self._basic_method_wrapper(self.hsv_analyser.sat_value_distribution),
+            # _kmeans_mean_color_diffs_15,
+            # _kmeans_mean_color_diffs_25,
+            # _kmeans_mean_color_diffs_35,
+            # _kmeans_mean_color_diffs_45,
+            # _kmeans_mean_color_diffs_55,
+            # _kmeans_mean_hsv_diffs_15,
+            # _kmeans_mean_hsv_diffs_25,
+            # _kmeans_mean_hsv_diffs_35,
+            # _kmeans_mean_hsv_diffs_45,
+            # _kmeans_mean_hsv_diffs_55,
+            # _kmeans_mean_color_diffs_3,
+            # _kmeans_mean_color_diffs_6,
+            # _kmeans_mean_color_diffs_9,
+            # _kmeans_mean_color_diffs_12,
+            # _kmeans_mean_hsv_diffs_3,
+            # _kmeans_mean_hsv_diffs_6,
+            # _kmeans_mean_hsv_diffs_9,
+            # _kmeans_mean_hsv_diffs_12,
+            self._basic_method_wrapper(self.gabor_filter.apply_filter),
         ]
 
         self.feature_names = [
-            "bilateral_filter_mean_color_diffs",
-            "bilateral_filter_n_color_diff",
-            "bilateral_filter_h_from_hsv_differences",
-            "color_counter_norm_color_count",
-            "edges_detector_grayscale_edges_factor",
-            "hsv_analyser_hsv_var",
-            "hsv_analyser_saturation_distribution",
-            "hsv_analyser_sat_value_distribution",
-            "kmeans_segementator_mean_color_diffs_15",
-            "kmeans_segementator_mean_color_diffs_25",
-            "kmeans_segementator_mean_color_diffs_35",
-            "kmeans_segementator_mean_color_diffs_45",
-            "kmeans_segementator_mean_color_diffs_55",
-            "kmeans_segementator_hsv_differences_15",
-            "kmeans_segementator_hsv_differences_25",
-            "kmeans_segementator_hsv_differences_35",
-            "kmeans_segementator_hsv_differences_45",
-            "kmeans_segementator_hsv_differences_55",
-            "kmeans_segementator_mean_color_diffs_3",
-            "kmeans_segementator_mean_color_diffs_6",
-            "kmeans_segementator_mean_color_diffs_9",
-            "kmeans_segementator_mean_color_diffs_12",
-            "kmeans_segementator_hsv_differences_3",
-            "kmeans_segementator_hsv_differences_6",
-            "kmeans_segementator_hsv_differences_9",
-            "kmeans_segementator_hsv_differences_12"
+            # "bilateral_filter_mean_color_diffs",
+            # "bilateral_filter_n_color_diff",
+            # "bilateral_filter_h_from_hsv_differences",
+            # "color_counter_norm_color_count",
+            # "edges_detector_grayscale_edges_factor",
+            # "hsv_analyser_hsv_var",
+            # "hsv_analyser_saturation_distribution",
+            # "hsv_analyser_sat_value_distribution",
+            # "kmeans_segementator_mean_color_diffs_15",
+            # "kmeans_segementator_mean_color_diffs_25",
+            # "kmeans_segementator_mean_color_diffs_35",
+            # "kmeans_segementator_mean_color_diffs_45",
+            # "kmeans_segementator_mean_color_diffs_55",
+            # "kmeans_segementator_hsv_differences_15",
+            # "kmeans_segementator_hsv_differences_25",
+            # "kmeans_segementator_hsv_differences_35",
+            # "kmeans_segementator_hsv_differences_45",
+            # "kmeans_segementator_hsv_differences_55",
+            # "kmeans_segementator_mean_color_diffs_3",
+            # "kmeans_segementator_mean_color_diffs_6",
+            # "kmeans_segementator_mean_color_diffs_9",
+            # "kmeans_segementator_mean_color_diffs_12",
+            # "kmeans_segementator_hsv_differences_3",
+            # "kmeans_segementator_hsv_differences_6",
+            # "kmeans_segementator_hsv_differences_9",
+            # "kmeans_segementator_hsv_differences_12",
+            "gabor_filter"
         ]
 
         if len(self.extraction_pipelines) != len(self.feature_names):
