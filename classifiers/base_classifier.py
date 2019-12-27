@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix, accuracy_score, f1_score
 import numpy as np
+from sklearn.multiclass import OneVsRestClassifier
 from sklearn.model_selection import cross_val_predict
 
 
@@ -9,6 +10,7 @@ class BaseClassifier():
     Base classifier for all implemented classifiers - parent class.
     All implemented classifiers needs to have implementation of its methods.
     """
+
     def __init__(self, x, y, x_feature_names, y_label_names, cv_parts=5):
         """
         :param x: list of x values/features in shape (number of instances x number of features); x_train
@@ -37,12 +39,16 @@ class BaseClassifier():
         y_pred = clf.predict(x_test)
         return clf, y_pred
 
-    def _cross_val_predict(self, clf):
+    def _cross_val_predict(self, clf, one_vs_rest: bool = False):
         """
         Given classifier returns predictions on cross-validated dataset.
         :param clf: instance of classifier
+        :param one_vs_rest: whether use one vs rest classification or not
         :return: y predictions for cross-validated x
         """
+        if one_vs_rest:
+            clf = OneVsRestClassifier(clf, n_jobs=-1)
+
         y_pred = cross_val_predict(clf, self.x, self.y, cv=self.cv_parts)
         return y_pred
 

@@ -25,13 +25,14 @@ class NaiveBayes(BaseClassifier):
         gnb, y_pred = self._predict(gnb, x_test)
         return y_pred
 
-    def crossval_gaussian_navie_bayes(self):
+    def crossval_gaussian_navie_bayes(self, one_vs_rest=False):
         """
         Simple Gaussian Naive Bayes using cross validation.
+        :param one_vs_rest: whether use one vs rest classification or not
         :return: y predicted for given x cross-validated parts.
         """
         gnb = GaussianNB()
-        y_pred = self._cross_val_predict(gnb)
+        y_pred = self._cross_val_predict(gnb, one_vs_rest)
         return y_pred
 
     # def complement_navie_bayes(self):

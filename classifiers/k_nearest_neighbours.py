@@ -26,13 +26,14 @@ class NearestNeighbours(BaseClassifier):
         knn, y_pred = self._predict(knn, x_test)
         return y_pred
 
-    def crossval_knn(self):
+    def crossval_knn(self, one_vs_rest: bool = False):
         """
         Basic kNN using cross validation.
+        :param one_vs_rest: whether to use one vs rest classification or not
         :return: y predict for cross-validated dataset
         """
         knn = KNeighborsClassifier(n_neighbors=self.num_neighbors)
-        y_pred = self._cross_val_predict(knn)
+        y_pred = self._cross_val_predict(knn, one_vs_rest)
         return y_pred
 
 

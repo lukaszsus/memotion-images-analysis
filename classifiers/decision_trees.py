@@ -36,13 +36,14 @@ class DecisionTree(BaseClassifier):
         clf, y_pred = self._predict(clf, x_test)
         return clf, y_pred
 
-    def crossval_decision_tree(self):
+    def crossval_decision_tree(self, one_vs_rest: bool  = False):
         """
         CART decision tree with cross-validated dataset.
+        :param one_vs_rest: whether to use one vs rest classification
         :return: y predict for cross-validated dataset
         """
         clf = DecisionTreeClassifier(max_depth=self.max_depth, min_samples_leaf=self.min_samples)
-        y_pred = self._cross_val_predict(clf)
+        y_pred = self._cross_val_predict(clf, one_vs_rest)
         return y_pred
 
     def random_forest(self, num_estimators=10, x_test=None):
@@ -55,14 +56,15 @@ class DecisionTree(BaseClassifier):
         clf, y_pred = self._predict(clf, x_test)
         return clf, y_pred
 
-    def crossval_random_forest(self, num_estimators=10):
+    def crossval_random_forest(self, num_estimators=10, one_vs_rest: bool = False):
         """
         Random forest run for cross-validated dataset.
         :param num_estimators: number of trees in forest
+        :param one_vs_rest: whether to use one vs rest classification
         :return: y predict for cross-validated dataset
         """
         clf = RandomForestClassifier(n_estimators=num_estimators)
-        y_pred = self._cross_val_predict(clf)
+        y_pred = self._cross_val_predict(clf, one_vs_rest)
         return y_pred
 
     def save_and_plot_tree(self, clf, fname='decision_tree', path='./tree_visualizations'):

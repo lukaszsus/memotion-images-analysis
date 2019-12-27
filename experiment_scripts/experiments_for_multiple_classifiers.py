@@ -20,17 +20,17 @@ def load_dataset(dirname, filename):
     return x, [filename] * x.shape[1]
 
 
-def decission_tree_metrics(x, y, x_labels, y_labels, max_depth=3, min_samples_leaf=5, estimators=15):
+def decission_tree_metrics(x, y, x_labels, y_labels, one_vs_rest=False, max_depth=3, min_samples_leaf=5, estimators=15):
     dt = DecisionTree(x, y, x_labels, y_labels, max_depth=max_depth, min_samples_leaf=min_samples_leaf)
 
     label_tree = 'Decision Tree (CART)'
-    y_pred_tree = dt.crossval_decision_tree()
+    y_pred_tree = dt.crossval_decision_tree(one_vs_rest)
     cm_tree = dt.plot_confusion_matrix(y_pred_tree, label=label_tree)
     dt.show_basic_metrics(y_pred_tree, label=label_tree)
     tree_acc, tree_f1 = dt.count_basic_metrics(y_pred_tree)
 
     label_forest = 'Random Forest'
-    y_pred_forest = dt.crossval_random_forest(num_estimators=estimators)
+    y_pred_forest = dt.crossval_random_forest(num_estimators=estimators, one_vs_rest=one_vs_rest)
     cm_forest = dt.plot_confusion_matrix(y_pred_forest, label=label_forest)
     dt.show_basic_metrics(y_pred_forest, label=label_forest)
     for_acc, for_f1 = dt.count_basic_metrics(y_pred_forest)
@@ -39,31 +39,31 @@ def decission_tree_metrics(x, y, x_labels, y_labels, max_depth=3, min_samples_le
             [label_forest, for_acc, for_f1, y_pred_forest, cm_forest]]
 
 
-def naive_bayes_metrics(x, y, x_labels, y_labels):
+def naive_bayes_metrics(x, y, x_labels, y_labels, one_vs_rest=False):
     nb = NaiveBayes(x, y, x_labels, y_labels)
 
     label = 'Gaussian Naive Bayes'
-    y_pred = nb.crossval_gaussian_navie_bayes()
+    y_pred = nb.crossval_gaussian_navie_bayes(one_vs_rest)
     nb.show_basic_metrics(y_pred, label=label)
     cm = nb.plot_confusion_matrix(y_pred, label=label)
     acc, f1 = nb.count_basic_metrics(y_pred)
     return [[label, acc, f1, y_pred, cm]]
 
 
-def knn_metrics(x, y, x_labels, y_labels, n_neighbours=3):
+def knn_metrics(x, y, x_labels, y_labels, one_vs_rest=False, n_neighbours=3):
     nn = NearestNeighbours(x, y, x_labels, y_labels, n_neigh=n_neighbours)
     label = 'k Nearest Neighbours'
-    y_pred_knn = nn.crossval_knn()
+    y_pred_knn = nn.crossval_knn(one_vs_rest)
     cm = nn.plot_confusion_matrix(y_pred_knn, label=label)
     nn.show_basic_metrics(y_pred_knn, label=label)
     acc, f1 = nn.count_basic_metrics(y_pred_knn)
     return [[label, acc, f1, y_pred_knn, cm]]
 
 
-def sklearn_mlp_metrics(x, y, x_labels, y_labels, hn=(64,), activation='relu'):
+def sklearn_mlp_metrics(x, y, x_labels, y_labels, one_vs_rest=False, hn=(64,), activation='relu'):
     nn = NeuralNetwork(x, y, x_labels, y_labels, hidden_neurons=hn, activation_fun=activation)
     label = 'Multilayer Perceptron'
-    y_pred_mlp = nn.crossval_mlp()
+    y_pred_mlp = nn.crossval_mlp(one_vs_rest)
     cm = nn.plot_confusion_matrix(y_pred_mlp, label=label)
     nn.show_basic_metrics(y_pred_mlp, label=label)
     acc, f1 = nn.count_basic_metrics(y_pred_mlp)
@@ -94,7 +94,7 @@ def plot_table_of_metrics(classifiers_metrics, dirname, feature_set_name):
     table.to_csv(file_path, index=False)
 
 
-def run_all_classifiers(x, y, x_labels, y_labels,
+def run_all_classifiers(x, y, x_labels, y_labels, one_vs_rest: bool = False,
                         max_depth=3, min_samples_leaf=5, estimators=15, n_neighbours=3, hn=(256,), activation='relu'):
     """
     Method that runs all classifiers and returns numpy array with accuracy and f-score for each (with classifier name).
@@ -102,6 +102,7 @@ def run_all_classifiers(x, y, x_labels, y_labels,
     :param y: label values (from 0 to 3) read from file
     :param x_labels: feature names
     :param y_labels: label names - cartoon, painting, photo and text
+    :param one_vs_rest: whether to use one vs rest classification
     :param max_depth: CART clf - maximum tree depth
     :param min_samples_leaf: CART clf - minimum number of samples in one leaf
     :param estimators: RandomForest clf - number of weak classifiers/trees
@@ -111,10 +112,10 @@ def run_all_classifiers(x, y, x_labels, y_labels,
     :return: numpy array of (clf_name, accuracy, f-score), y_predicted and confussion_matrix)
     """
 
-    naive_bayes = naive_bayes_metrics(x, y, x_labels, y_labels)
-    trees = decission_tree_metrics(x, y, x_labels, y_labels, max_depth, min_samples_leaf, estimators)
-    knn = knn_metrics(x, y, x_labels, y_labels, n_neighbours)
-    nn = sklearn_mlp_metrics(x, y, x_labels, y_labels, hn, activation)
+    naive_bayes = naive_bayes_metrics(x, y, x_labels, y_labels, one_vs_rest=one_vs_rest)
+    trees = decission_tree_metrics(x, y, x_labels, y_labels, one_vs_rest, max_depth, min_samples_leaf, estimators)
+    knn = knn_metrics(x, y, x_labels, y_labels, one_vs_rest, n_neighbours)
+    nn = sklearn_mlp_metrics(x, y, x_labels, y_labels, one_vs_rest, hn, activation)
     classifiers_metrics = np.array(naive_bayes + trees + knn + nn)
 
     metrics, y_preds, confusion_matrices = classifiers_metrics[:, :-2], \
@@ -207,30 +208,30 @@ if __name__ == "__main__":
         # ['{}_bilateral_filter_h_from_hsv_differences'],
         # ['{}_bilateral_filter_mean_color_diffs'],
         # ['{}_bilateral_filter_n_color_diff'],
-        # ['{}_bilateral_filter_h_from_hsv_differences',
-        #  '{}_bilateral_filter_mean_color_diffs',
-        #  '{}_bilateral_filter_n_color_diff'],
-        # ['{}_color_counter_norm_color_count',
-        #  '{}_edges_detector_grayscale_edges_factor'],
-        # ['{}_hsv_analyser_hsv_var'],
-        # ['{}_hsv_analyser_saturation_distribution'],
-        # ['{}_hsv_analyser_sat_value_distribution'],
-        # ['{}_bilateral_filter_h_from_hsv_differences',
-        #  '{}_bilateral_filter_mean_color_diffs',
-        #  '{}_bilateral_filter_n_color_diff',
-        #  '{}_color_counter_norm_color_count',
-        #  '{}_edges_detector_grayscale_edges_factor'],
-        # ['{}_hsv_analyser_hsv_var',
-        #  '{}_hsv_analyser_saturation_distribution',
-        #  '{}_hsv_analyser_sat_value_distribution'],
-        # ['{}_bilateral_filter_h_from_hsv_differences',
-        #  '{}_bilateral_filter_mean_color_diffs',
-        #  '{}_bilateral_filter_n_color_diff',
-        #  '{}_color_counter_norm_color_count',
-        #  '{}_edges_detector_grayscale_edges_factor',
-        #  '{}_hsv_analyser_hsv_var',
-        #  '{}_hsv_analyser_saturation_distribution',
-        #  '{}_hsv_analyser_sat_value_distribution'],
+        ['{}_bilateral_filter_h_from_hsv_differences',
+         '{}_bilateral_filter_mean_color_diffs',
+         '{}_bilateral_filter_n_color_diff'],
+        ['{}_color_counter_norm_color_count',
+         '{}_edges_detector_grayscale_edges_factor'],
+        ['{}_hsv_analyser_hsv_var'],
+        ['{}_hsv_analyser_saturation_distribution'],
+        ['{}_hsv_analyser_sat_value_distribution'],
+        ['{}_bilateral_filter_h_from_hsv_differences',
+         '{}_bilateral_filter_mean_color_diffs',
+         '{}_bilateral_filter_n_color_diff',
+         '{}_color_counter_norm_color_count',
+         '{}_edges_detector_grayscale_edges_factor'],
+        ['{}_hsv_analyser_hsv_var',
+         '{}_hsv_analyser_saturation_distribution',
+         '{}_hsv_analyser_sat_value_distribution'],
+        ['{}_bilateral_filter_h_from_hsv_differences',
+         '{}_bilateral_filter_mean_color_diffs',
+         '{}_bilateral_filter_n_color_diff',
+         '{}_color_counter_norm_color_count',
+         '{}_edges_detector_grayscale_edges_factor',
+         '{}_hsv_analyser_hsv_var',
+         '{}_hsv_analyser_saturation_distribution',
+         '{}_hsv_analyser_sat_value_distribution'],
         # ['{}_kmeans_segementator_hsv_differences_15',
         #  '{}_kmeans_segementator_hsv_differences_25',
         #  '{}_kmeans_segementator_hsv_differences_35',
@@ -241,24 +242,24 @@ if __name__ == "__main__":
         #  '{}_kmeans_segementator_mean_color_diffs_35',
         #  '{}_kmeans_segementator_mean_color_diffs_45',
         #  '{}_kmeans_segementator_mean_color_diffs_55'],
-        # ['{}_bilateral_filter_h_from_hsv_differences',
-        #  '{}_bilateral_filter_mean_color_diffs',
-        #  '{}_bilateral_filter_n_color_diff',
-        #  '{}_color_counter_norm_color_count',
-        #  '{}_edges_detector_grayscale_edges_factor',
-        #  '{}_hsv_analyser_hsv_var',
-        #  '{}_hsv_analyser_saturation_distribution',
-        #  '{}_hsv_analyser_sat_value_distribution',
-        #  '{}_kmeans_segementator_hsv_differences_15',
-        #  '{}_kmeans_segementator_hsv_differences_25',
-        #  '{}_kmeans_segementator_hsv_differences_35',
-        #  '{}_kmeans_segementator_hsv_differences_45',
-        #  '{}_kmeans_segementator_hsv_differences_55',
-        #  '{}_kmeans_segementator_mean_color_diffs_15',
-        #  '{}_kmeans_segementator_mean_color_diffs_25',
-        #  '{}_kmeans_segementator_mean_color_diffs_35',
-        #  '{}_kmeans_segementator_mean_color_diffs_45',
-        #  '{}_kmeans_segementator_mean_color_diffs_55'],
+        ['{}_bilateral_filter_h_from_hsv_differences',
+         '{}_bilateral_filter_mean_color_diffs',
+         '{}_bilateral_filter_n_color_diff',
+         '{}_color_counter_norm_color_count',
+         '{}_edges_detector_grayscale_edges_factor',
+         '{}_hsv_analyser_hsv_var',
+         '{}_hsv_analyser_saturation_distribution',
+         '{}_hsv_analyser_sat_value_distribution',
+         '{}_kmeans_segementator_hsv_differences_15',
+         '{}_kmeans_segementator_hsv_differences_25',
+         '{}_kmeans_segementator_hsv_differences_35',
+         '{}_kmeans_segementator_hsv_differences_45',
+         '{}_kmeans_segementator_hsv_differences_55',
+         '{}_kmeans_segementator_mean_color_diffs_15',
+         '{}_kmeans_segementator_mean_color_diffs_25',
+         '{}_kmeans_segementator_mean_color_diffs_35',
+         '{}_kmeans_segementator_mean_color_diffs_45',
+         '{}_kmeans_segementator_mean_color_diffs_55'],
         # ['{}_kmeans_segementator_hsv_differences_3',
         #  '{}_kmeans_segementator_hsv_differences_6',
         #  '{}_kmeans_segementator_hsv_differences_9',
@@ -283,41 +284,41 @@ if __name__ == "__main__":
         #  '{}_kmeans_segementator_mean_color_diffs_6',
         #  '{}_kmeans_segementator_mean_color_diffs_9',
         #  '{}_kmeans_segementator_mean_color_diffs_12'],
-        # ['{}_gabor_filter'],
-        # ['{}_bilateral_filter_h_from_hsv_differences',
-        #  '{}_bilateral_filter_mean_color_diffs',
-        #  '{}_bilateral_filter_n_color_diff',
-        #  '{}_color_counter_norm_color_count',
-        #  '{}_edges_detector_grayscale_edges_factor',
-        #  '{}_gabor_filter'],
-        # ['{}_bilateral_filter_h_from_hsv_differences',
-        #  '{}_bilateral_filter_mean_color_diffs',
-        #  '{}_bilateral_filter_n_color_diff',
-        #  '{}_color_counter_norm_color_count',
-        #  '{}_edges_detector_grayscale_edges_factor',
-        #  '{}_hsv_analyser_hsv_var',
-        #  '{}_hsv_analyser_saturation_distribution',
-        #  '{}_hsv_analyser_sat_value_distribution',
-        #  '{}_gabor_filter'],
-        # ['{}_bilateral_filter_h_from_hsv_differences',
-        #  '{}_bilateral_filter_mean_color_diffs',
-        #  '{}_bilateral_filter_n_color_diff',
-        #  '{}_color_counter_norm_color_count',
-        #  '{}_edges_detector_grayscale_edges_factor',
-        #  '{}_hsv_analyser_hsv_var',
-        #  '{}_hsv_analyser_saturation_distribution',
-        #  '{}_hsv_analyser_sat_value_distribution',
-        #  '{}_kmeans_segementator_hsv_differences_15',
-        #  '{}_kmeans_segementator_hsv_differences_25',
-        #  '{}_kmeans_segementator_hsv_differences_35',
-        #  '{}_kmeans_segementator_hsv_differences_45',
-        #  '{}_kmeans_segementator_hsv_differences_55',
-        #  '{}_kmeans_segementator_mean_color_diffs_15',
-        #  '{}_kmeans_segementator_mean_color_diffs_25',
-        #  '{}_kmeans_segementator_mean_color_diffs_35',
-        #  '{}_kmeans_segementator_mean_color_diffs_45',
-        #  '{}_kmeans_segementator_mean_color_diffs_55',
-        #  '{}_gabor_filter'],
+        ['{}_gabor_filter'],
+        ['{}_bilateral_filter_h_from_hsv_differences',
+         '{}_bilateral_filter_mean_color_diffs',
+         '{}_bilateral_filter_n_color_diff',
+         '{}_color_counter_norm_color_count',
+         '{}_edges_detector_grayscale_edges_factor',
+         '{}_gabor_filter'],
+        ['{}_bilateral_filter_h_from_hsv_differences',
+         '{}_bilateral_filter_mean_color_diffs',
+         '{}_bilateral_filter_n_color_diff',
+         '{}_color_counter_norm_color_count',
+         '{}_edges_detector_grayscale_edges_factor',
+         '{}_hsv_analyser_hsv_var',
+         '{}_hsv_analyser_saturation_distribution',
+         '{}_hsv_analyser_sat_value_distribution',
+         '{}_gabor_filter'],
+        ['{}_bilateral_filter_h_from_hsv_differences',
+         '{}_bilateral_filter_mean_color_diffs',
+         '{}_bilateral_filter_n_color_diff',
+         '{}_color_counter_norm_color_count',
+         '{}_edges_detector_grayscale_edges_factor',
+         '{}_hsv_analyser_hsv_var',
+         '{}_hsv_analyser_saturation_distribution',
+         '{}_hsv_analyser_sat_value_distribution',
+         '{}_kmeans_segementator_hsv_differences_15',
+         '{}_kmeans_segementator_hsv_differences_25',
+         '{}_kmeans_segementator_hsv_differences_35',
+         '{}_kmeans_segementator_hsv_differences_45',
+         '{}_kmeans_segementator_hsv_differences_55',
+         '{}_kmeans_segementator_mean_color_diffs_15',
+         '{}_kmeans_segementator_mean_color_diffs_25',
+         '{}_kmeans_segementator_mean_color_diffs_35',
+         '{}_kmeans_segementator_mean_color_diffs_45',
+         '{}_kmeans_segementator_mean_color_diffs_55',
+         '{}_gabor_filter'],
         ['{}_bilateral_filter_h_from_hsv_differences',
          '{}_bilateral_filter_mean_color_diffs',
          '{}_bilateral_filter_n_color_diff',
@@ -335,48 +336,54 @@ if __name__ == "__main__":
         # ['bilateral_filter_h_from_hsv_differences'],
         # ['bilateral_filter_mean_color_diffs'],
         # ['bilateral_filter_n_color_diff'],
-        # ['bilateral_filter'],
-        # ['color_counter_edges_detector'],
-        # ['hsv_analyser_hsv_var'],
-        # ['hsv_analyser_saturation_distribution'],
-        # ['hsv_analyser_sat_value_distribution'],
-        # ['scalar'],
-        # ['hsv_analyser'],
-        # ['scalar_hsv'],
+        ['bilateral_filter'],
+        ['color_counter_edges_detector'],
+        ['hsv_analyser_hsv_var'],
+        ['hsv_analyser_saturation_distribution'],
+        ['hsv_analyser_sat_value_distribution'],
+        ['scalar'],
+        ['hsv_analyser'],
+        ['scalar_hsv'],
         # ['kmeans_hsv'],
         # ['kmeans_mean'],
-        # ['scalar_hsv_kmeans'],
+        ['scalar_hsv_kmeans'],
         # ['kmeans_hsv3'],
         # ['kmeans_mean3'],
         # ['scalar_hsv_kmeans3']
-        # ['gabor_filter'],
-        # ['scalar_gabor'],
-        # ['scalar_hsv_gabor'],
-        # ['scalar_hsv_kmeans_gabor']
+        ['gabor_filter'],
+        ['scalar_gabor'],
+        ['scalar_hsv_gabor'],
+        ['scalar_hsv_kmeans_gabor'],
         ['scalar_kmeans_gabor']
     ]
 
     im_types = ["pics", "memes"]
     stands = [True, False]
     y_labels = ["cartoon", "painting", "photo", "text"]
-    for im_type in im_types:
-        for stand in stands:
-            dirname = im_type + "_feature_binaries"
-            y = load_y_from_file(dirname, im_type)
-            for i in range(len(filenames_list)):
-                filenames = filenames_list[i]
-                feature_set_name = features_names[i]
-                filenames_formatted = format_filenames(filenames, im_type)
-                x, x_labels = load_x_y_from_files(dirname, filenames_formatted)
+    one_vs_rests = [True]  # , False]
+    for one_vs_rest in one_vs_rests:
+        for im_type in im_types:
+            for stand in stands:
+                dirname = im_type + "_feature_binaries"
+                y = load_y_from_file(dirname, im_type)
+                for i in range(len(filenames_list)):
+                    filenames = filenames_list[i]
+                    feature_set_name = features_names[i]
+                    filenames_formatted = format_filenames(filenames, im_type)
+                    x, x_labels = load_x_y_from_files(dirname, filenames_formatted)
 
-                if stand:
-                    im_type_stand = im_type + "_stand"
-                    x = preprocessing.scale(x)
-                else:
-                    im_type_stand = im_type
+                    if stand:
+                        im_type_stand = im_type + "_stand"
+                        x = preprocessing.scale(x)
+                    else:
+                        im_type_stand = im_type
 
-                classifiers_metrics, y_preds, confusion_matrices = run_all_classifiers(x, y, x_labels, y_labels)
-                plot_table_of_metrics(classifiers_metrics, im_type_stand, feature_set_name)
-                save_metrics_to_file(classifiers_metrics, y, y_preds, confusion_matrices, im_type_stand,
-                                     feature_set_name)
-                save_cms_to_files(confusion_matrices, im_type_stand, feature_set_name, y_labels)
+                    if one_vs_rest:
+                        im_type_stand = im_type_stand + "_one_vs_rest"
+
+                    classifiers_metrics, y_preds, confusion_matrices = \
+                        run_all_classifiers(x, y, x_labels, y_labels, one_vs_rest)
+                    plot_table_of_metrics(classifiers_metrics, im_type_stand, feature_set_name)
+                    save_metrics_to_file(classifiers_metrics, y, y_preds, confusion_matrices, im_type_stand,
+                                         feature_set_name)
+                    save_cms_to_files(confusion_matrices, im_type_stand, feature_set_name, y_labels)

@@ -16,11 +16,11 @@ Academic project for subject Image and video analysis. It is a part of bigger pr
 - [M] Zrobić PCA
 - [Ł] Zrobić klasyfikator złożony, który zrobi klasyfikację na podstawie klasyfikacji innych klasyfikatorów
 - [Ł] ~~Zrobić filtry Gabora lub inną cechę częstotliwościową~~
-- [Ł] Zrobić klasyfikację 1-vs-rest
+- [Ł] ~~Zrobić klasyfikację 1-vs-rest~~
+- [Ł] Porównać z uczeniem głębokim, np. VGG-16
 
 - [Ł] Wygenerować sztuczny zbiór obrazów połączonych
-- [M] Sprawdzić brutal force dla separacji obrazów połączonych
-- [M] Sprawdzić coś innego dla obrazów połączonych - np. gwałtowną zmianę gradientu
+- [M] Sprawdzić brutal force dla separacji obrazów połączonych - np. znaleźć gwałtowną zmianę gradientu
 
 
 ### Drzewo katalogów (wybrane foldery)
