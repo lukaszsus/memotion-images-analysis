@@ -13,7 +13,7 @@ Academic project for subject Image and video analysis. It is a part of bigger pr
 - [M] Dorobić wykresiki (inne niż *confussion matrix*)
 
 - [Ł] ~~Połączyć memes i pics i zbadać zależność wyników od rozmiaru~~
-- [M] Zrobić PCA
+- [Ł] ~~Zrobić PCA~~
 - [Ł] Zrobić klasyfikator złożony, który zrobi klasyfikację na podstawie klasyfikacji innych klasyfikatorów
 - [Ł] ~~Zrobić filtry Gabora lub inną cechę częstotliwościową~~
 - [Ł] ~~Zrobić klasyfikację 1-vs-rest~~
