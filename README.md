@@ -10,18 +10,17 @@ Academic project for subject Image and video analysis. It is a part of bigger pr
 - [Ł] ~~Dodać zapisywanie cech~~
     * dodać wersję z przeskalowaniem (tam gdzie konieczne albo wszędzie)
 - [M] ~~Dodać trochę danych treningowych i wysłać Łukaszowi~~
-- [M] Dorobić wykresiki (inne niż *confussion matrix*) ??? nie wiem czy aktualne
+- [M] Dorobić wykresiki (inne niż *confussion matrix*)
 
 - [Ł] ~~Połączyć memes i pics i zbadać zależność wyników od rozmiaru~~
 - [Ł] ~~Zrobić PCA~~
 - [Ł] Zrobić klasyfikator złożony, który zrobi klasyfikację na podstawie klasyfikacji innych klasyfikatorów
 - [Ł] ~~Zrobić filtry Gabora lub inną cechę częstotliwościową~~
 - [Ł] ~~Zrobić klasyfikację 1-vs-rest~~
-- [Ł] ~~Porównać z uczeniem głębokim, np. VGG-16~~
+- [Ł] Porównać z uczeniem głębokim, np. VGG-16
 
 - [Ł] Wygenerować sztuczny zbiór obrazów połączonych
 - [M] Sprawdzić brutal force dla separacji obrazów połączonych - np. znaleźć gwałtowną zmianę gradientu
-- [M] Wizualizacja wyników badań
 
 
 ### Drzewo katalogów (wybrane foldery)
