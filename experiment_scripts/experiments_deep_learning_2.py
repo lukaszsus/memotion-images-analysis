@@ -9,60 +9,62 @@ from sklearn.metrics import f1_score
 from deep_learning.dataset_loader import create_train_test_ds_generator, INPUT_SIZE, CLASS_NAMES
 from deep_learning.utils import plot_acc_loss, prepare_and_plot_confusion_matrix, save_summary, create_dirs, \
     DEEP_LEARNING_PARENT_DIR
-from deep_learning.vgg_model import VggModel
 from tensorflow.compat.v1 import ConfigProto, InteractiveSession
+
+from deep_learning.vgg_model_2 import VggModel2
 
 """
 That's for GPU training and maintaining one session and nice cuda lib loading.
 """
 config = ConfigProto()
 config.gpu_options.allow_growth = True
-config.gpu_options.per_process_gpu_memory_fraction = 0.99
+config.gpu_options.per_process_gpu_memory_fraction = 0.75
 session = InteractiveSession(config=config)
 
 
 def do_experiments():
     models_params = list()
 
-    models_cls = [VggModel]
-    num_epochs = [10]
-    # num_epochs_fine_tuning = [3]
+    models_cls = [VggModel2]
+    num_epochs = [7]
+    num_epochs_fine_tuning = [3]
     batch_sizes = [32]
     optimizers_cls = ['Adam']
-    learning_rates = [0.0001, 0.001]
-    dense_sizes_list = [(4096, 4), (256, 4)]
-    dropouts = [0.0, 0.2, 0.5]
+    learning_rates = [0.001]  # [0.0001, 0.001]
+    dense_sizes_list = [(4096, 4)]  # , (256, 4)]
+    dropouts = [0.2]  # [0.0, 0.2, 0.5]
 
     i = 0
     for model_cls in models_cls:
         for dense_sizes in dense_sizes_list:
             for dropout in dropouts:
                 for epochs in num_epochs:
-                    # for fine_tuning_epochs in num_epochs_fine_tuning:
-                    for batch_size in batch_sizes:
-                        for optimizer_cls in optimizers_cls:
-                            for learning_rate in learning_rates:
-                                row = {"model_name": "model{}".format(i),
-                                       "model_cls": model_cls,
-                                       "dense_sizes": dense_sizes,
-                                       "dropout": dropout,
-                                       "epochs": epochs,
-                                       # "fine_tuning_epochs": fine_tuning_epochs,
-                                       "batch_size": batch_size,
-                                       "optimizer_cls": optimizer_cls,
-                                       "learning_rate": learning_rate}
-                                models_params.append(row)
-                                i += 1
+                    for fine_tuning_epochs in num_epochs_fine_tuning:
+                        for batch_size in batch_sizes:
+                            for optimizer_cls in optimizers_cls:
+                                for learning_rate in learning_rates:
+                                    row = {"model_name": "model{}".format(i),
+                                           "model_cls": model_cls,
+                                           "dense_sizes": dense_sizes,
+                                           "dropout": dropout,
+                                           "epochs": epochs,
+                                           "fine_tuning_epochs": fine_tuning_epochs,
+                                           "batch_size": batch_size,
+                                           "optimizer_cls": optimizer_cls,
+                                           "learning_rate": learning_rate}
+                                    models_params.append(row)
+                                    i += 1
 
     columns = ["model_name", "model_cls",
                "dense_sizes",
                "dropout",
                "epochs",
-               # "fine_tuning_epochs",
+               "fine_tuning_epochs",
                "batch_size",
                "optimizer_cls",
                "learning_rate",
-               "epoch_time", "time", "accuracy", "f1_score"]
+               # "epoch_time", "time",
+               "accuracy", "f1_score"]
     results = pd.DataFrame(columns=columns)
 
     dt = datetime.now().strftime('%Y-%m-%d-t%H-%M')
@@ -74,16 +76,26 @@ def do_experiments():
         model = model_params["model_cls"](height=INPUT_SIZE["height"], width=INPUT_SIZE["width"],
                                           num_channels=INPUT_SIZE["num_channels"],
                                           dense_sizes=model_params["dense_sizes"],
-                                          dropout=model_params["dropout"], optimizer=optimizer)
-        history = model.fit(train_dataset=train_dataset, test_dataset=test_dataset, epochs=model_params["epochs"])
-        # history_tuning = model.fine_tune(train_dataset=train_dataset, test_dataset=test_dataset,
-        #                                  epochs=model_params["fine_tuning_epochs"])
-        # history["elasped"] = history_tuning["elapsed"]
-        # history["epoch_time"] = history_tuning["epoch_time"]
-        # history["train_acc"] = history_tuning["train_acc"]
-        # history["train_loss"] = history_tuning["train_loss"]
-        # history["test_acc"] = history_tuning["test_acc"]
-        # history["test_loss"] = history_tuning["test_loss"]
+                                          dropout=model_params["dropout"])
+        model.compile(optimizer=optimizer,
+                      loss=tf.keras.losses.SparseCategoricalCrossentropy(),
+                      metrics=[tf.keras.metrics.SparseCategoricalAccuracy()])
+        history = model.fit_generator(generator=train_dataset, validation_data=test_dataset,
+                                      epochs=model_params["epochs"])
+
+        # fine tuning
+        model.base_model.trainable = True
+        model.compile(optimizer=optimizer,
+                      loss=tf.keras.losses.SparseCategoricalCrossentropy(),
+                      metrics=[tf.keras.metrics.SparseCategoricalAccuracy()])
+        history = model.fit_generator(generator=train_dataset, validation_data=test_dataset,
+                                      epochs=model_params["fine_tuning_epochs"])
+
+        history = history.history
+        history["train_acc"] = history["sparse_categorical_accuracy"]
+        history["test_acc"] = history["val_sparse_categorical_accuracy"]
+        history["train_loss"] = history["loss"]
+        history["test_loss"] = history["val_loss"]
 
         predictions = list()
         y_test = list()
@@ -99,12 +111,12 @@ def do_experiments():
                "dense_sizes": params["dense_sizes"],
                "dropout": params["dropout"],
                "epochs": params["epochs"],
-               # "fine_tuning_epochs": params["fine_tuning_epochs"],
+               "fine_tuning_epochs": params["fine_tuning_epochs"],
                "batch_size": params["batch_size"],
                "optimizer_cls": params["optimizer_cls"],
                "learning_rate": params["learning_rate"],
-               "epoch_time": history["epoch_time"],
-               "time": history["elapsed"],
+               # "epoch_time": history["epoch_time"],
+               # "time": history["elapsed"],
                "accuracy": history["test_acc"][-1],
                "f1_score": f1score}
         print(row)

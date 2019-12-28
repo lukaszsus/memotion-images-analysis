@@ -4,7 +4,7 @@ from tqdm import tqdm
 
 
 class VggModel(tf.keras.Model):
-    def __init__(self, height, width, num_channels, dense_sizes, dropout, loss_object=None, optimizer=None, kernel_initializer='glorot_normal'):
+    def __init__(self, height, width, num_channels, dense_sizes, dropout, loss_object=None, optimizer=None):
         """Inits the class."""
         super().__init__()
         self.base_model = None
@@ -41,11 +41,13 @@ class VggModel(tf.keras.Model):
         for i, size in enumerate(dense_sizes):
             if i < len(dense_sizes) - 1:
                 self.dense_layers.append(tf.keras.layers.Dense(size, activation=tf.nn.relu,
-                                                               kernel_initializer="glorot_normal"))
-                self.dense_layers.append(tf.keras.layers.Dropout(dropout))
+                                                               kernel_initializer="glorot_normal",
+                                                               dtype=tf.float32))
+                self.dense_layers.append(tf.keras.layers.Dropout(dropout, dtype=tf.float32))
             else:
                 self.dense_layers.append(tf.keras.layers.Dense(size, activation=tf.nn.softmax,
-                                                               kernel_initializer="glorot_normal"))
+                                                               kernel_initializer="glorot_normal",
+                                                               dtype=tf.float32))
 
     def call(self, inputs, training=False):
         """Makes forward pass of the network."""
@@ -102,15 +104,46 @@ class VggModel(tf.keras.Model):
 
         return self.history
 
-    def fine_tune(self, **kwargs):
-        """
-        Implements fine tuning loop for the model.
-        """
-        self.base_model.trainable = True
-
-        self.fit(**kwargs)
-
-        return self.history
+    # def fine_tune(self, **kwargs):
+    #     """
+    #     Implements fine tuning loop for the model.
+    #     """
+    #     self.base_model.trainable = True
+    #     self.build()
+    #
+    #     self.train_dataset = kwargs.get('train_dataset')
+    #     self.test_dataset = kwargs.get('test_dataset')
+    #     epochs = kwargs.get('epochs', 10)
+    #
+    #     start_time = time.time()
+    #     for epoch in range(epochs):
+    #         for images, labels in tqdm(self.train_dataset):
+    #             self.train_step(images, labels)
+    #
+    #         for x_test, y_test in tqdm(self.test_dataset):
+    #             self.test_step(x_test, y_test)
+    #
+    #         template = 'Epoch {}, Loss: {}, Accuracy: {} ' + 'Test Loss: {}, Test Accuracy: {}'
+    #         print(template.format(epoch + 1,
+    #                               self.train_loss.result(),
+    #                               self.train_accuracy.result() * 100,
+    #                               self.test_loss.result(),
+    #                               self.test_accuracy.result() * 100))
+    #
+    #         self.__update_metrics_history()
+    #
+    #         # Reset the metrics for the next epoch
+    #         self.train_loss.reset_states()
+    #         self.train_accuracy.reset_states()
+    #         self.test_loss.reset_states()
+    #         self.test_accuracy.reset_states()
+    #
+    #     elapsed = time.time() - start_time
+    #     epoch_time = elapsed / epochs
+    #     self.history["elapsed"] = elapsed
+    #     self.history["epoch_time"] = epoch_time
+    #
+    #     return self.history
 
     def predict(self, x):
         """Predicts outputs based on inputs (x)."""

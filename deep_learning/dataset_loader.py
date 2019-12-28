@@ -52,7 +52,7 @@ def create_ds_generator(files, categories, batch_size):
     """
     path_ds = tf.data.Dataset.from_tensor_slices(files)
     image_ds = path_ds.map(load_and_preprocess_image, num_parallel_calls=tf.data.experimental.AUTOTUNE)
-    label_ds = tf.data.Dataset.from_tensor_slices(tf.cast(categories, tf.int64))
+    label_ds = tf.data.Dataset.from_tensor_slices(tf.cast(categories, tf.int32))
     image_label_ds = tf.data.Dataset.zip((image_ds, label_ds))
 
     ds_generator = image_label_ds.shuffle(buffer_size=1000 * batch_size)
@@ -65,10 +65,10 @@ def create_ds_generator(files, categories, batch_size):
 def create_train_test_ds_generator(batch_size):
     files, categories = create_file_paths_for_generator()
     train_files, test_files, train_categories, test_categories = train_test_split(files, categories,
-                                                                                  test_size=0.1, random_state=42,
+                                                                                  test_size=0.3, random_state=42,
                                                                                   stratify=categories)
     train_ds_generator = create_ds_generator(train_files, train_categories, batch_size)
-    test_ds_generator = create_ds_generator(test_files, test_categories, batch_size=1)
+    test_ds_generator = create_ds_generator(test_files, test_categories, batch_size=batch_size)
     return train_ds_generator, test_ds_generator
 
 
