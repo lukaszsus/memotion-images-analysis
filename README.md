@@ -3,25 +3,20 @@ Academic project for subject Image and video analysis. It is a part of bigger pr
 
 ---------------
 ### TODO
-
-- [Ł] ~~Zmergować kod~~
-- [M] ~~Dodać MLP, inne klasyfikatory, cross_validation~~
-    * zapisywać wyniki do pliku
-- [Ł] ~~Dodać zapisywanie cech~~
-    * dodać wersję z przeskalowaniem (tam gdzie konieczne albo wszędzie)
-- [M] ~~Dodać trochę danych treningowych i wysłać Łukaszowi~~
-- [M] Dorobić wykresiki (inne niż *confussion matrix*)
-
 - [Ł] ~~Połączyć memes i pics i zbadać zależność wyników od rozmiaru~~
 - [Ł] ~~Zrobić PCA~~
-- [Ł] Zrobić klasyfikator złożony, który zrobi klasyfikację na podstawie klasyfikacji innych klasyfikatorów
 - [Ł] ~~Zrobić filtry Gabora lub inną cechę częstotliwościową~~
 - [Ł] ~~Zrobić klasyfikację 1-vs-rest~~
-- [Ł] Porównać z uczeniem głębokim, np. VGG-16
-
+- [Ł] ~~Porównać z uczeniem głębokim, np. VGG-16~~
 - [Ł] Wygenerować sztuczny zbiór obrazów połączonych
-- [M] Sprawdzić brutal force dla separacji obrazów połączonych - np. znaleźć gwałtowną zmianę gradientu
-
+- Skalowanie na zasadzie segmentacji obrazów 
+  (segmentacja, ustandaryzowanie mody histogramu)
+- Zrobić klasyfikator złożony, który zrobi klasyfikację na podstawie klasyfikacji innych klasyfikatorów
+  Zespół klasyfikatorów
+    - cechy klasyfikatorów jako wejście do sieci neuronowej
+- ###Dzielenie danych na podobrazki (badanie struktury)
+    - badanie gradientów wzdłuż pionów i poziomów obrazka
+    - tworzenie bounding boxów
 
 ### Drzewo katalogów (wybrane foldery)
 
