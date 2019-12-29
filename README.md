@@ -2,7 +2,7 @@
 Academic project for subject Image and video analysis. It is a part of bigger project called Memotion Analysis.
 
 ---------------
-## TODO
+## Lista zadań
 
 - PCA
 - Skalowanie na zasadzie segmentacji obrazów 
@@ -11,14 +11,27 @@ Academic project for subject Image and video analysis. It is a part of bigger pr
     - cechy klasyfikatorów jako wejście do sieci neuronowej
 - Klasyfikacja z wyodrębnieniem jednej klasy
 - Wykres skuteczności w zależności od wielkości zbioru danych
-- ###Dzielenie danych na podobrazki (badanie struktury)
+- **Dzielenie danych na podobrazki (badanie struktury)**
     - badanie gradientów wzdłuż pionów i poziomów obrazka
     - tworzenie bounding boxów
+
+## TODO
+
+- [Ł] ~~Połączyć memes i pics i zbadać zależność wyników od rozmiaru~~
+- [Ł] ~~Zrobić PCA~~
+- [Ł] Zrobić klasyfikator złożony, który zrobi klasyfikację na podstawie klasyfikacji innych klasyfikatorów
+- [Ł] ~~Zrobić filtry Gabora lub inną cechę częstotliwościową~~
+- [Ł] ~~Zrobić klasyfikację 1-vs-rest~~
+- [Ł] Porównać z uczeniem głębokim, np. VGG-16
+- [Ł] Wygenerować sztuczny zbiór obrazów połączonych
+- [M] Sprawdzić brutal force dla separacji obrazów połączonych - np. znaleźć gwałtowną zmianę gradientu
+    - sprawdzone i średnio działa :p 
+- [M] Podzielić obrazki na podobrazki
 
 
 
 ## Drzewo katalogów (wybrane foldery)
-
+```bash
 ├── classifiers   
 │   ├── base_classifier.py  
 │   ├── decision_trees.py  
@@ -33,20 +46,20 @@ Academic project for subject Image and video analysis. It is a part of bigger pr
 │       ├── painting  
 │       ├── photo    
 │       └── text  
-│   ├── rescaled_dataset *jeszcze nie zrobiony*  
-│   ├── results - *tu zapisywane są wszystkie metryki i obrazki do prezki*  
-│       ├── metrics *metrics from experiments*  
-│           ├── memes      
+│   ├── rescaled_dataset *jeszcze nie zrobiony*
+│   ├── results - *tu zapisywane są wszystkie metryki i obrazki do prezki*
+│       ├── metrics *metrics from experiments*
+│           ├── memes    
 │           ├── pics       
-│       ├── plots *plots contatining tables and confusion matrices*  
+│       ├── plots *plots contatining tables and confusion matrices*
 │           ├── memes      
 │           ├── pics    
-│       ├── tables  *tables with average f1 score and accuracy*  
+│       ├── tables  *tables with average f1 score and accuracy*
 │           ├── memes      
 │           ├── pics  
-|   ├── **memes_feature_binaries** *binarki memes z base_dataset*  
-|   ├── **pics_feature_binaries** *binarki pics z base_dataset*  
-│   ├── **datasets_pkl** - *tu zapisywane są wyliczone cechy w .pkl*  
+|   ├── **memes_feature_binaries** *binarki memes z base_dataset*
+|   ├── **pics_feature_binaries** *binarki pics z base_dataset*
+│   ├── **datasets_pkl** - *tu zapisywane są wyliczone cechy w .pkl*
 
 ├── **data_as_dataset_saver.py** - *tu jest plik do zapisywania cech na brudno (mma)*  
 
@@ -65,3 +78,4 @@ Academic project for subject Image and video analysis. It is a part of bigger pr
 ├── feature_selection  
 │   ├── dataset_creator.py  
 │   └── test_datasetCreator.py  
+```

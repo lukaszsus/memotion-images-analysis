@@ -278,5 +278,3 @@ class FeatureExtractor():
             return self.kmeans_segementator.hsv_differences(im, self.kmeans_segementator.apply_kmeans(im))
         return pipeline
 
-
-
