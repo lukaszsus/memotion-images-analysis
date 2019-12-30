@@ -14,9 +14,11 @@ Academic project for subject Image and video analysis. It is a part of bigger pr
 - Zrobić klasyfikator złożony, który zrobi klasyfikację na podstawie klasyfikacji innych klasyfikatorów
   Zespół klasyfikatorów
     - cechy klasyfikatorów jako wejście do sieci neuronowej
-- ###Dzielenie danych na podobrazki (badanie struktury)
+- [M] Dzielenie danych na podobrazki (badanie struktury)
+    - ~~transformacja Hough'a~~
     - badanie gradientów wzdłuż pionów i poziomów obrazka
-    - tworzenie bounding boxów
+        - sprawdzone: średnio działa, ale mogę próbować jeszcze potem walczyć
+    - ~~tworzenie bounding boxów~~
 
 ### Drzewo katalogów (wybrane foldery)
 
@@ -33,7 +35,8 @@ Academic project for subject Image and video analysis. It is a part of bigger pr
 │       ├── cartoon      
 │       ├── painting  
 │       ├── photo    
-│       └── text  
+│       ├── text 
+│       └── segmentation  # dane do segmentacji 
 │   ├── rescaled_dataset *jeszcze nie zrobiony*
 │   ├── results - *tu zapisywane są wszystkie metryki i obrazki do prezki*
 │       ├── metrics *metrics from experiments*
@@ -66,6 +69,4 @@ Academic project for subject Image and video analysis. It is a part of bigger pr
 ├── feature_selection  
 │   ├── dataset_creator.py  
 │   └── test_datasetCreator.py  
-
-├── **results** - *przeniosłabym to do ./data/results do jakiegoś podfolderu może*  \
-    *wywaliłem całkiem, bo nie jest już nam chyba do szczęścia potrzebne*
+```

@@ -7,3 +7,5 @@ data/
 venv/
 results/
 
+mma/
+classifiers/tree_visualizations
