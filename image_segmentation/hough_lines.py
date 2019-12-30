@@ -5,16 +5,34 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from data_loader.utils import load_image_by_cv2
-from feature_extraction.color_counter import ColorCounter
 
 
 class HoughLines:
+    """
+    Class responsible for image segmentation based on Hough Transformation.
+    """
     def __init__(self):
-        pass
+        """
+        Sets default thresholds values.
+        """
+        self.min_canny_threshold = 50
+        self.max_canny_threshold = 150
+        self.min_mask_threshold = 240
+        self.max_mask_threshold = 260
 
-    def get_image_with_lines(self, img, min_line_len=150, plot=False):
+    def get_image_with_lines(self, img, min_line_len=None, plot=False, verbose=False):
+        """
+        Applies Hough Transformation on
+        :param img: image loaded by opencv in RGB
+        :param min_line_len: minimum number of collinear points to make a line;
+                    if None value will be adjusted automatically - recommended
+        :param plot: boolean flag; if True images are plotted
+        :return: processed image with white lines | normalised value of edges due to all pixels
+        """
         gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-        edges = cv2.Canny(gray, 50, 150, apertureSize=3)
+        edges = cv2.Canny(gray, self.min_canny_threshold, self.max_canny_threshold, apertureSize=3)
+        norm_edges = int(np.sum(edges) / 255) / (edges.shape[0] * edges.shape[1])
+        x, y = gray.shape
 
         if plot:
             # plt.figure(figsize=(5, 10))
@@ -24,8 +42,9 @@ class HoughLines:
 
         image = img.copy()
 
-        lines = cv2.HoughLines(edges, 1, np.pi / 180, min_line_len)
-        # print(f'Lines: {len(lines)}')
+        auto_min_line_len = min(int(norm_edges * min(x, y) * 10), int(0.8 * min(x, y)))
+        lines = cv2.HoughLines(edges, 1, np.pi / 180, auto_min_line_len if min_line_len is None else min_line_len)
+
         if lines is not None:
             for line in lines:
                 rho, theta = line[0]
@@ -38,17 +57,27 @@ class HoughLines:
                 x2 = int(x0 - 1000 * (-b))
                 y2 = int(y0 - 1000 * (a))
                 cv2.line(img, (x1, y1), (x2, y2), (255, 0, 0), 5)
-                cv2.line(image, (x1, y1), (x2, y2), (255, 255, 255), 10)
+                if abs(abs(x1) - abs(x2)) < 5 and abs(abs(y1) - abs(y2)) < 5 and x1*x2*y1*y2 < 0:
+                    cv2.line(image, (x1, y1), (x2, y2), (255, 255, 255), 10)
+                elif verbose:
+                    print(' non horizontal line detected but not included')
 
-            if plot:
-                # plt.figure(figsize=(5, 10))
-                plt.imshow(img, cmap='gray')
-                plt.axis('off')
-                plt.show()
+        if plot:
+            # plt.figure(figsize=(5, 10))
+            plt.imshow(img, cmap='gray')
+            plt.title(f'Detected {0 if lines is None else len(lines)} lines')
+            plt.axis('off')
+            plt.show()
 
-        return image, int(np.sum(edges) / 255) / (edges.shape[0] * edges.shape[1])
+        return image, round(norm_edges, 4), auto_min_line_len
 
-    def get_bounding_boxes(self, img, plot=False):
+    def get_bounding_boxes(self, img, plot=False, plot_title=''):
+        """
+        Applies mask on image and finds bounding boxes of pictures on white background.
+        :param img:
+        :param plot:
+        :return:
+        """
         size = list(img.shape[:2])
         size.reverse()  # get a [width,height] list
 
@@ -58,13 +87,13 @@ class HoughLines:
         }
 
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        ret, thresh = cv2.threshold(gray, self.min_mask_threshold, self.max_mask_threshold,
+                                    cv2.THRESH_BINARY_INV)
 
-        tmin = 220
-        tmax = 255
-        ret, thresh = cv2.threshold(gray, tmin, tmax, cv2.THRESH_BINARY_INV)
-
-        # plt.imshow(thresh)
-        # plt.show()
+        if plot:
+            plt.imshow(thresh)
+            plt.axis('off')
+            plt.show()
 
         _, contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -74,64 +103,63 @@ class HoughLines:
 
             epsilon = 0.01 * arclength
             approx = cv2.approxPolyDP(contour, epsilon, True)
-            # print('\nApprox:', approx.shape, approx)
             x, y, w, h = cv2.boundingRect(approx)
 
-            # exclude very small panels
-            if w < infos['size'][0] / 15 or h < infos['size'][1] / 15 or approx.shape[0] > 4:
-                # print('...panel excluded\n')
+            # exclude to small panels
+            if w < infos['size'][0] / 4 or h < infos['size'][1] / 4:
                 continue
 
-            contourSize = int(sum(infos['size']) / 2 * 0.01)
-            cv2.drawContours(img, [approx], 0, (255, 0, 0), contourSize)
+            approx_points = list(approx.reshape(-1, 2))
+            rect_points = list(np.array([[x, y], [x, y+h], [x+w, y], [x+w, y+h]]))
+            if self._found_correct_bounding_boxes(rect_points, approx_points):
+                contour_size = int(sum(infos['size']) / 2 * 0.01)
+                # cv2.drawContours(img, [approx], 0, (0, 255, 0), contour_size)
+                cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), contour_size)
 
-            panel = [x, y, w, h]
-            infos['panels'].append(panel)
+                panel = [x, y, w, h]
+                infos['panels'].append(panel)
 
         if len(infos['panels']) == 0:
             infos['panels'].append([0, 0, infos['size'][0], infos['size'][1]])
 
-        for panel in infos['panels']:
-            x, y, w, h = panel
-            panel = {
-                'x': x,
-                'y': y,
-                'w': w,
-                'h': h
-            }
-
         if plot:
             # plt.figure(figsize=(5, 10))
             plt.imshow(img)
+            plt.title(plot_title)
             plt.axis('off')
             plt.show()
 
         return infos['panels']
 
+    def _found_correct_bounding_boxes(self, rect_points, approx_points):
+        """
+        Checks if contour (approx_points) has at least 3 common corners with detected bounding box.
+        :param rect_points: real corners (bounding box)
+        :param approx_points: all contour points (not necessarily rectangle)
+        :return: True if contour has at least 3 real corners
+        """
+        results = []
+        for i, a in enumerate(rect_points):
+            results.append([])
+            for b in approx_points:
+                results[i].append(np.linalg.norm(a - b))
+        res = [sorted(r)[0] for r in results]
+        return sum(sorted(res)[:-1]) < 15
+
 
 if __name__ == "__main__":
-    from time import time
-    file_names = ['drake', 'cartoon_3', 'cat', 'kermit', 'none_5', 'stats']
-    labels = [2, 3, 2, 1, 1, 3]
+    file_name = 'stats'
+    file_path = os.path.join("base_dataset", "segmentation", file_name + '.jpg')
+    loaded_image = load_image_by_cv2(file_path)
+    x, y, _ = loaded_image.shape
 
-    for i, file_name in enumerate(file_names):
-        # file_name = 'drake.jpg'
-        file_path = os.path.join("base_dataset", "segmentation", file_name + '.jpg')
-        loaded_image = load_image_by_cv2(file_path)
-        x, y, _ = loaded_image.shape
-        cc = ColorCounter()
+    hl = HoughLines()
+    l = None
 
-        print(x, y)
-        # print(cc.norm_color_count(loaded_image))
-        # print(cc.norm_color_count_without_white_and_black(loaded_image))
+    print(f'\nMinimum no of points: {"automatic" if l is None else l}')
+    im, norm_edges, auto_min_line_len = hl.get_image_with_lines(loaded_image.copy(), l, plot=False)
+    print(f'Normalized edges: {norm_edges}')
+    print(f'Automatic value of min_lines: {auto_min_line_len}')
 
-        hl = HoughLines()
-        lines = [120, 150, 180, 200, 250, 300, 350, 400, 450, 500]
-        # lines = [100]
-        # lines = np.array(np.linspace(int(upper_border/3), int(upper_border/2), 10), dtype=np.int32)
-        print('\n\n-------------------\n', file_name.upper())
-        for l in lines:
-            print(f'\nMinimum no of points: {l}')
-            im, norm_edges = hl.get_image_with_lines(loaded_image.copy(), l, plot=False)
-            print(f'Normalized edges: {round(norm_edges, 4)}')
-            hl.get_bounding_boxes(im, plot=False)
+    boxes = hl.get_bounding_boxes(im, plot=False)
+    print(f'Bounding boxes: {len(boxes)}')
