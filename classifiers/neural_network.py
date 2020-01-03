@@ -30,13 +30,13 @@ class NeuralNetwork(BaseClassifier):
         mlp, y_pred = self._predict(mlp)
         return y_pred
 
-    def crossval_mlp(self, one_vs_rest: bool = False):
+    def crossval_mlp(self, one_vs_rest: bool = False, max_iter=500):
         """
         Simple implementation of MLP with cross-validated dataset
         :param one_vs_rest: whether to use one vs rest classification
         :return: y predictions for cross-validated x
         """
-        mlp = MLPClassifier(hidden_layer_sizes=self.hn, activation=self.activation_fun, max_iter=500)
+        mlp = MLPClassifier(hidden_layer_sizes=self.hn, activation=self.activation_fun, max_iter=max_iter)
         y_pred = self._cross_val_predict(mlp, one_vs_rest)
         return y_pred
 

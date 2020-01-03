@@ -1,3 +1,4 @@
+import glob
 import os
 
 import cv2
@@ -5,6 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from data_loader.utils import load_image_by_cv2
+from user_settings import DATA_PATH
 
 
 class HoughLines:
@@ -107,7 +109,7 @@ class HoughLines:
             x, y, w, h = cv2.boundingRect(approx)
 
             # exclude to small panels
-            if w < infos['size'][0] / 4 or h < infos['size'][1] / 4:
+            if w < infos['size'][0] / 5 or h < infos['size'][1] / 5:
                 continue
 
             approx_points = list(approx.reshape(-1, 2))
@@ -149,18 +151,20 @@ class HoughLines:
 
 
 if __name__ == "__main__":
-    file_name = 'stats'
-    file_path = os.path.join("base_dataset", "segmentation", file_name + '.jpg')
-    loaded_image = load_image_by_cv2(file_path)
+    file_name = 'tumblr_8'
+    file_path = os.path.join(DATA_PATH, "base_dataset", "segmentation", "tests")
+    filename = glob.glob(f'{file_path}/{file_name}*')[0]
+
+    loaded_image = load_image_by_cv2(filename)
     x, y, _ = loaded_image.shape
 
     hl = HoughLines()
-    l = None
+    l = 250
 
     print(f'\nMinimum no of points: {"automatic" if l is None else l}')
-    im, norm_edges, auto_min_line_len = hl.get_image_with_lines(loaded_image.copy(), l, plot=False)
+    im, norm_edges, auto_min_line_len = hl.get_image_with_lines(loaded_image.copy(), l, plot=True)
     print(f'Normalized edges: {norm_edges}')
     print(f'Automatic value of min_lines: {auto_min_line_len}')
 
-    boxes = hl.get_bounding_boxes(im, plot=False)
+    boxes = hl.get_bounding_boxes(im, plot=True)
     print(f'Bounding boxes: {len(boxes)}')
