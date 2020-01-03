@@ -22,12 +22,13 @@ class HoughLines:
 
     def get_image_with_lines(self, img, min_line_len=None, plot=False, verbose=False):
         """
-        Applies Hough Transformation on
+        Applies Hough Transformation - finds vertical and horizontal lines.
         :param img: image loaded by opencv in RGB
         :param min_line_len: minimum number of collinear points to make a line;
                     if None value will be adjusted automatically - recommended
         :param plot: boolean flag; if True images are plotted
-        :return: processed image with white lines | normalised value of edges due to all pixels
+        :return: processed image with white lines | normalised value of edges due to all pixels |
+                    value of param for Hough Transform
         """
         gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
         edges = cv2.Canny(gray, self.min_canny_threshold, self.max_canny_threshold, apertureSize=3)
@@ -74,9 +75,9 @@ class HoughLines:
     def get_bounding_boxes(self, img, plot=False, plot_title=''):
         """
         Applies mask on image and finds bounding boxes of pictures on white background.
-        :param img:
-        :param plot:
-        :return:
+        :param img: opencv image in RGB
+        :param plot: boolean flag
+        :return: list of bounding boxes
         """
         size = list(img.shape[:2])
         size.reverse()  # get a [width,height] list
@@ -86,7 +87,7 @@ class HoughLines:
             'panels': []
         }
 
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
         ret, thresh = cv2.threshold(gray, self.min_mask_threshold, self.max_mask_threshold,
                                     cv2.THRESH_BINARY_INV)
 
