@@ -3,6 +3,7 @@ __pycache__
 user_settings.py
 
 data/
+data_20191228/
 
 venv/
 results/
