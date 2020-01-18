@@ -13,16 +13,28 @@ class HoughLines:
     """
     Class responsible for image segmentation based on Hough Transformation.
     """
-    def __init__(self):
+    def __init__(self, min_ct=50, max_ct=150, min_mask=240, max_mask=260):
         """
         Sets default thresholds values.
         """
-        self.min_canny_threshold = 50
-        self.max_canny_threshold = 150
-        self.min_mask_threshold = 240
-        self.max_mask_threshold = 260
+        self.min_canny_threshold = min_ct
+        self.max_canny_threshold = max_ct
+        self.min_mask_threshold = min_mask
+        self.max_mask_threshold = max_mask
 
-    def get_image_with_lines(self, img, min_line_len=None, plot=False, verbose=False):
+    def get_edges(self, img, plot=False):
+        gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+        edges = cv2.Canny(gray, self.min_canny_threshold, self.max_canny_threshold, apertureSize=3)
+
+        if plot:
+            # plt.figure(figsize=(5, 10))
+            plt.imshow(edges, cmap='gray')
+            plt.axis('off')
+            plt.show()
+
+        return edges
+
+    def get_image_with_lines(self, img, edges, min_line_len=None, plot=False, verbose=False):
         """
         Applies Hough Transformation - finds vertical and horizontal lines.
         :param img: image loaded by opencv in RGB
@@ -32,16 +44,8 @@ class HoughLines:
         :return: processed image with white lines | normalised value of edges due to all pixels |
                     value of param for Hough Transform
         """
-        gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-        edges = cv2.Canny(gray, self.min_canny_threshold, self.max_canny_threshold, apertureSize=3)
-        norm_edges = int(np.sum(edges) / 255) / (edges.shape[0] * edges.shape[1])
-        x, y = gray.shape
-
-        if plot:
-            # plt.figure(figsize=(5, 10))
-            plt.imshow(edges, cmap='gray')
-            plt.axis('off')
-            plt.show()
+        x, y, _ = img.shape
+        norm_edges = int(np.sum(edges) / 255) / (x * y)
 
         image = img.copy()
 
@@ -151,7 +155,7 @@ class HoughLines:
 
 
 if __name__ == "__main__":
-    file_name = 'tumblr_8'
+    file_name = '06_2'
     file_path = os.path.join(DATA_PATH, "base_dataset", "segmentation", "tests")
     filename = glob.glob(f'{file_path}/{file_name}*')[0]
 
@@ -159,10 +163,11 @@ if __name__ == "__main__":
     x, y, _ = loaded_image.shape
 
     hl = HoughLines()
-    l = 250
+    l = None
 
     print(f'\nMinimum no of points: {"automatic" if l is None else l}')
-    im, norm_edges, auto_min_line_len = hl.get_image_with_lines(loaded_image.copy(), l, plot=True)
+    edges = hl.get_edges(loaded_image.copy())
+    im, norm_edges, auto_min_line_len = hl.get_image_with_lines(loaded_image.copy(), edges, l, plot=True)
     print(f'Normalized edges: {norm_edges}')
     print(f'Automatic value of min_lines: {auto_min_line_len}')
 

@@ -14,7 +14,8 @@ class TestHoughLines(TestCase):
         image = load_image_by_cv2(file_path)
 
         hl = HoughLines()
-        im, norm_edges, auto_min_line_len = hl.get_image_with_lines(image)
+        edges = hl.get_edges(image)
+        im, norm_edges, auto_min_line_len = hl.get_image_with_lines(image, edges)
         boxes = hl.get_bounding_boxes(im, plot=False)
 
         self.assertEqual(len(boxes), 3)
