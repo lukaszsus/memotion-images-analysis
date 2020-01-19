@@ -55,7 +55,7 @@ class EdgesDetector():
 
         return colors, grays
 
-    def grayscale_edges_factor_color_plots(self, im_photo, threshold_index=3):
+    def grayscale_edges_factor_color_plots(self, im_photo, threshold_index=2):
         colors, grays = self._grayscale_edges_factor_features_for_plots(im_photo)
         plt.imshow(colors[threshold_index], cmap='gray')
         plt.xticks([]), plt.yticks([])

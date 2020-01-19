@@ -36,7 +36,10 @@ class SingleImagePlotter():
         Simply plots image.
         :param image: image as numpy array
         """
-        h, w, _ = image.shape
+        try:
+            h, w, _ = image.shape
+        except Exception:
+            h, w = image.shape
         plt.figure(figsize=(int(w/100), int(h/100)))
         plt.axis("off")
         plt.imshow(image)
