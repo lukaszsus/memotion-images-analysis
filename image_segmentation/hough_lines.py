@@ -7,13 +7,14 @@ import matplotlib.pyplot as plt
 
 from data_loader.utils import load_image_by_cv2
 from user_settings import DATA_PATH
+from visualization.single_image_plotter import SingleImagePlotter
 
 
 class HoughLines:
     """
     Class responsible for image segmentation based on Hough Transformation.
     """
-    def __init__(self, min_ct=50, max_ct=150, min_mask=240, max_mask=260):
+    def __init__(self, min_ct=50, max_ct=175, min_mask=240, max_mask=260):
         """
         Sets default thresholds values.
         """
@@ -49,7 +50,7 @@ class HoughLines:
 
         image = img.copy()
 
-        auto_min_line_len = min(int(norm_edges * min(x, y) * 10), int(0.8 * min(x, y)))
+        auto_min_line_len = min(int(norm_edges * min(x, y) * 8), int(0.9 * min(x, y)))
         lines = cv2.HoughLines(edges, 1, np.pi / 180, auto_min_line_len if min_line_len is None else min_line_len)
 
         if lines is not None:
@@ -155,7 +156,7 @@ class HoughLines:
 
 
 if __name__ == "__main__":
-    file_name = '06_2'
+    file_name = '12_5'
     file_path = os.path.join(DATA_PATH, "base_dataset", "segmentation", "tests")
     filename = glob.glob(f'{file_path}/{file_name}*')[0]
 
@@ -165,9 +166,13 @@ if __name__ == "__main__":
     hl = HoughLines()
     l = None
 
+    print(loaded_image.shape)
+    sip = SingleImagePlotter()
+    sip.plot_image(loaded_image)
+
     print(f'\nMinimum no of points: {"automatic" if l is None else l}')
-    edges = hl.get_edges(loaded_image.copy())
-    im, norm_edges, auto_min_line_len = hl.get_image_with_lines(loaded_image.copy(), edges, l, plot=True)
+    edges = hl.get_edges(loaded_image.copy(), plot=False)
+    im, norm_edges, auto_min_line_len = hl.get_image_with_lines(loaded_image.copy(), edges, l, plot=False)
     print(f'Normalized edges: {norm_edges}')
     print(f'Automatic value of min_lines: {auto_min_line_len}')
 

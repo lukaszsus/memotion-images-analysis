@@ -94,46 +94,46 @@ if __name__ == "__main__":
     clfs_y, methods_names, y, cms = load_classifiers_metrics(subdir=subdir)
     x, y = get_x_y(clfs_y, y)
 
-    cm_rf, y_pred_rf = classifier_of_classifiers(x, y, y_labels, no_trees=128)
-    cm_voting, y_pred_voting = majority_voting(x, y, y_labels)
-
-    sns.set_context(rc={"font.size": 12, "axes.titlesize": 15, "axes.labelsize": 13})
-    plot_cm_pink_xD(cm_rf, 'Random Forest')
+    # cm_rf, y_pred_rf = classifier_of_classifiers(x, y, y_labels, no_trees=128)
+    # cm_voting, y_pred_voting = majority_voting(x, y, y_labels)
+    #
+    # sns.set_context(rc={"font.size": 12, "axes.titlesize": 15, "axes.labelsize": 13})
+    # plot_cm_pink_xD(cm_rf, 'Random Forest')
     # plot_cm_pink_xD(cm_voting, 'Majority Voting')
 
     # pd.set_option('display.max_rows', 150)
     # df = pd.DataFrame(np.array([y, y_pred_voting]).T, columns=['True labels', 'Clf'])
     # print(df[df['True labels'] != df['Clf']])
 
-    # sns.set()
-    # sns.set_palette('PuRd_r')
-    #
-    # trees = [8, 16, 32, 64, 128, 256, 512]
-    # accs, times = [], []
-    # for i in range(10):
-    #     print(f'{i+1} round...')
-    #     accs.append([])
-    #     times.append([])
-    #     for t in trees:
-    #         start = time.time()
-    #         acc, f1 = classifier_of_classifiers(x, y, y_labels, no_trees=t, verbose=False)
-    #         end = time.time()
-    #         accs[i].append(acc)
-    #         times[i].append(end - start)
-    #
-    # plt.figure(figsize=(7, 4))
-    # plt.plot(trees, np.mean(accs, axis=0), linewidth=5)
-    # plt.yticks(fontsize=13)
-    # plt.xticks(fontsize=13)
-    # plt.title('Wykres zależności dokładności predykcji (accuracy)\nod liczby drzew \n', fontsize=14)
-    # # plt.xscale('log')
-    # plt.show()
-    #
-    # sns.set_palette('PiYG')
-    # plt.figure(figsize=(7, 4))
-    # plt.plot(trees, np.mean(times, axis=0), linewidth=5)
-    # plt.yticks(fontsize=13)
-    # plt.xticks(fontsize=13)
-    # plt.title('Wykres zależności czasu od liczby drzew \n', fontsize=14)
-    # # plt.xscale('log')
-    # plt.show()
+    sns.set()
+    sns.set_palette('PuRd_r')
+
+    trees = [8, 16, 32, 64, 128, 256, 512]
+    accs, times = [], []
+    for i in range(10):
+        print(f'{i+1} round...')
+        accs.append([])
+        times.append([])
+        for t in trees:
+            start = time.time()
+            acc, f1 = classifier_of_classifiers(x, y, y_labels, no_trees=t, verbose=False)
+            end = time.time()
+            accs[i].append(acc)
+            times[i].append(end - start)
+
+    plt.figure(figsize=(7, 4))
+    plt.plot(trees, np.mean(accs, axis=0), linewidth=5)
+    plt.yticks(fontsize=13)
+    plt.xticks(fontsize=13)
+    plt.title('Wykres zależności dokładności predykcji (accuracy)\nod liczby drzew \n', fontsize=14)
+    # plt.xscale('log')
+    plt.show()
+
+    sns.set_palette('PiYG')
+    plt.figure(figsize=(7, 6))
+    plt.plot(trees, np.mean(times, axis=0), linewidth=5)
+    plt.yticks(fontsize=13)
+    plt.xticks(fontsize=13)
+    plt.title('Wykres zależności czasu od liczby drzew \n', fontsize=14)
+    # plt.xscale('log')
+    plt.show()

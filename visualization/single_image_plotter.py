@@ -5,7 +5,6 @@ import numpy as np
 from settings import DATA_PATH
 
 
-
 class SingleImagePlotter():
     """
     Shows plots connected with given image.
@@ -40,7 +39,8 @@ class SingleImagePlotter():
             h, w, _ = image.shape
         except Exception:
             h, w = image.shape
-        plt.figure(figsize=(int(w/100), int(h/100)))
+        # plt.figure(figsize=(int(w/100), int(h/100)))
+        # plt.figure(figsize=(20, 10))
         plt.axis("off")
         plt.imshow(image)
         plt.show()

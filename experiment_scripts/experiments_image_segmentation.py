@@ -25,10 +25,10 @@ def hough_tests_for_all_params(plot_stats=True, plot=False, verbose=True):
         image = load_image_by_cv2(file_name)
         cv2_images.append(image)
 
-    min_canny_thresholds = [60]  # [40, 50, 60]
-    max_canny_thresholds = [175]  # [125, 150, 175]
-    min_mask_thresholds = [235, 240, 245]
-    max_mask_thresholds = [250, 260, 270]
+    min_canny_thresholds = [50]  # [40, 50, 60]
+    max_canny_thresholds = [180, 185, 190, 195, 200]  # [125, 150, 175]
+    min_mask_thresholds = [235]  # [235, 240, 245]
+    max_mask_thresholds = [260]  # [250, 260, 270]
 
     df = pd.DataFrame(columns=['time', 'min_canny', 'max_canny', 'min_mask', 'max_mask',
                                'auto_fun', 'auto_param1', 'auto_param2', 'num_wrong', 'num_all'])
@@ -43,8 +43,8 @@ def hough_tests_for_all_params(plot_stats=True, plot=False, verbose=True):
                     cv2_edges = get_edges_for_given_params(cv2_images, hl)
 
                     funs = [min]
-                    params1 = [8, 8.5, 9, 9.5, 10, 10.5, 11]
-                    params2 = [0.8, 0.85, 0.9]
+                    params1 = [7, 7.5, 8]  # [8, 8.5, 9, 9.5, 10, 10.5, 11]
+                    params2 = [0.9]  # [0.8, 0.85, 0.9]
 
                     for fun in funs:
                         fun_name = fun.__name__
