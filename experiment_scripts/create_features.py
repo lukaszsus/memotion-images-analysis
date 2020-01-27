@@ -13,7 +13,7 @@ import os
 import sys
 sys.path.append(os.getcwd())
 from settings import DATA_PATH
-from feature_selection.feature_extractor import FeatureExtractor
+from feature_selection.feature_selectorpy import FeatureSelector
 
 
 def get_args() -> argparse.Namespace:
@@ -47,13 +47,13 @@ if __name__ == '__main__':
     dst_path = os.path.join(DATA_PATH, args.dst_path) if args.type is not None \
         else os.path.join(DATA_PATH, "test_pics_feature_binaries")
 
-    feature_extractor = FeatureExtractor()
-    feature_extractor.create_features_from_dir(src_path=source_path,
+    feature_selector = FeatureSelector()
+    feature_selector.create_features_from_dir(src_path=source_path,
+                                              im_type=type,
+                                              save_path=dst_path)
+    feature_selector.create_labels_from_dir(src_path=source_path,
+                                            im_type=type,
+                                            save_path=dst_path)
+    feature_selector.create_path_list_from_dir(src_path=source_path,
                                                im_type=type,
                                                save_path=dst_path)
-    feature_extractor.create_labels_from_dir(src_path=source_path,
-                                             im_type=type,
-                                             save_path=dst_path)
-    feature_extractor.create_path_list_from_dir(src_path=source_path,
-                                                im_type=type,
-                                                save_path=dst_path)

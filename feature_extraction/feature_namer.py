@@ -1,7 +1,7 @@
 from deprecated import deprecated
 
 
-@deprecated(reason="Idea of storing features names has been changed. Use FeatureExtractor class instead.")
+@deprecated(reason="Idea of storing features names has been changed. Use FeatureSelector class instead.")
 class FeatureNamer():
     def __init__(self):
         pass

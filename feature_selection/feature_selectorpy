@@ -14,7 +14,7 @@ from functools import partial
 from tqdm import tqdm
 
 
-class FeatureExtractor():
+class FeatureSelector():
     """
     Class creates pickle file with features and labels for every feature extractors' method.
     """
