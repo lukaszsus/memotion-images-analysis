@@ -26,7 +26,6 @@ def do_experiments():
 
     models_cls = [VggModel]
     num_epochs = [10]
-    # num_epochs_fine_tuning = [3]
     batch_sizes = [32]
     optimizers_cls = ['Adam']
     learning_rates = [0.0001, 0.001]
@@ -38,7 +37,6 @@ def do_experiments():
         for dense_sizes in dense_sizes_list:
             for dropout in dropouts:
                 for epochs in num_epochs:
-                    # for fine_tuning_epochs in num_epochs_fine_tuning:
                     for batch_size in batch_sizes:
                         for optimizer_cls in optimizers_cls:
                             for learning_rate in learning_rates:
@@ -47,7 +45,6 @@ def do_experiments():
                                        "dense_sizes": dense_sizes,
                                        "dropout": dropout,
                                        "epochs": epochs,
-                                       # "fine_tuning_epochs": fine_tuning_epochs,
                                        "batch_size": batch_size,
                                        "optimizer_cls": optimizer_cls,
                                        "learning_rate": learning_rate}
@@ -76,14 +73,6 @@ def do_experiments():
                                           dense_sizes=model_params["dense_sizes"],
                                           dropout=model_params["dropout"], optimizer=optimizer)
         history = model.fit(train_dataset=train_dataset, test_dataset=test_dataset, epochs=model_params["epochs"])
-        # history_tuning = model.fine_tune(train_dataset=train_dataset, test_dataset=test_dataset,
-        #                                  epochs=model_params["fine_tuning_epochs"])
-        # history["elasped"] = history_tuning["elapsed"]
-        # history["epoch_time"] = history_tuning["epoch_time"]
-        # history["train_acc"] = history_tuning["train_acc"]
-        # history["train_loss"] = history_tuning["train_loss"]
-        # history["test_acc"] = history_tuning["test_acc"]
-        # history["test_loss"] = history_tuning["test_loss"]
 
         predictions = list()
         y_test = list()
@@ -99,7 +88,6 @@ def do_experiments():
                "dense_sizes": params["dense_sizes"],
                "dropout": params["dropout"],
                "epochs": params["epochs"],
-               # "fine_tuning_epochs": params["fine_tuning_epochs"],
                "batch_size": params["batch_size"],
                "optimizer_cls": params["optimizer_cls"],
                "learning_rate": params["learning_rate"],

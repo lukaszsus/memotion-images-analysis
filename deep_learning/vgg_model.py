@@ -104,47 +104,6 @@ class VggModel(tf.keras.Model):
 
         return self.history
 
-    # def fine_tune(self, **kwargs):
-    #     """
-    #     Implements fine tuning loop for the model.
-    #     """
-    #     self.base_model.trainable = True
-    #     self.build()
-    #
-    #     self.train_dataset = kwargs.get('train_dataset')
-    #     self.test_dataset = kwargs.get('test_dataset')
-    #     epochs = kwargs.get('epochs', 10)
-    #
-    #     start_time = time.time()
-    #     for epoch in range(epochs):
-    #         for images, labels in tqdm(self.train_dataset):
-    #             self.train_step(images, labels)
-    #
-    #         for x_test, y_test in tqdm(self.test_dataset):
-    #             self.test_step(x_test, y_test)
-    #
-    #         template = 'Epoch {}, Loss: {}, Accuracy: {} ' + 'Test Loss: {}, Test Accuracy: {}'
-    #         print(template.format(epoch + 1,
-    #                               self.train_loss.result(),
-    #                               self.train_accuracy.result() * 100,
-    #                               self.test_loss.result(),
-    #                               self.test_accuracy.result() * 100))
-    #
-    #         self.__update_metrics_history()
-    #
-    #         # Reset the metrics for the next epoch
-    #         self.train_loss.reset_states()
-    #         self.train_accuracy.reset_states()
-    #         self.test_loss.reset_states()
-    #         self.test_accuracy.reset_states()
-    #
-    #     elapsed = time.time() - start_time
-    #     epoch_time = elapsed / epochs
-    #     self.history["elapsed"] = elapsed
-    #     self.history["epoch_time"] = epoch_time
-    #
-    #     return self.history
-
     def predict(self, x):
         """Predicts outputs based on inputs (x)."""
         return tf.argmax(self.call(x, training=False), axis=1)

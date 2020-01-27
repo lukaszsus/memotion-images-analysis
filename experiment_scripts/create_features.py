@@ -5,15 +5,15 @@ output of one method from feature generator.
 
 I can be run from console, for example:
 
-python3 experiment_scripts/create_features.py --source-path "base_dataset" --type "pics" --dst-path "pics_feature_binaries"
-python3 experiment_scripts/create_features.py --source-path "base_dataset" --type "memes" --dst-path "memes_feature_binaries"
+python3 experiment_scripts/create_features.py --source-path "data/base_dataset" --type "pics" --dst-path "data/pics_feature_binaries"
+python3 experiment_scripts/create_features.py --source-path "data/base_dataset" --type "memes" --dst-path "data/memes_feature_binaries"
 """
 import argparse
 import os
 import sys
 sys.path.append(os.getcwd())
 from settings import DATA_PATH
-from feature_selection.feature_selectorpy import FeatureSelector
+from feature_selection.feature_selector import FeatureSelector
 
 
 def get_args() -> argparse.Namespace:
