@@ -21,7 +21,7 @@ Jako strukturę rozumie się liczbę podobrazów, z~których składa się grafik
 │   ├── tests_for_multiple_classifiers.py  
 
 ├── data                    # dane projektu     
-│   ├── base_dataset        # obrazy podzielone na klasy; jeden folder dla jednej klasy     
+│   ├── base_dataset        # obrazy podzielone na klasy; jeden folder dla jednej klasy (oprócz folderu segmentation)   
 │      ├── cartoon         
 │      ├── painting  
 │      ├── photo    
