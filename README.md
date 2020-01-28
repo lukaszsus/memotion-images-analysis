@@ -90,7 +90,8 @@ Jako strukturę rozumie się liczbę podobrazów, z~których składa się grafik
 │   └── utils.py        
 
 ├── AOW prezentacja końcowa.pdf         
-├── AOW prezentacja końcowa.pptx      
+├── AOW prezentacja końcowa.pptx  
+├── aow_raport_mma_ls.pdf                 
 ├── README.md       
 ├── requirements.txt               
 ├── settings.py         # importer ścieżek z user_settings.py   
