@@ -94,16 +94,16 @@ if __name__ == "__main__":
     clfs_y, methods_names, y, cms = load_classifiers_metrics(subdir=subdir)
     x, y = get_x_y(clfs_y, y)
 
-    # cm_rf, y_pred_rf = classifier_of_classifiers(x, y, y_labels, no_trees=128)
-    # cm_voting, y_pred_voting = majority_voting(x, y, y_labels)
-    #
-    # sns.set_context(rc={"font.size": 12, "axes.titlesize": 15, "axes.labelsize": 13})
-    # plot_cm_pink_xD(cm_rf, 'Random Forest')
-    # plot_cm_pink_xD(cm_voting, 'Majority Voting')
+    cm_rf, y_pred_rf = classifier_of_classifiers(x, y, y_labels, no_trees=128)
+    cm_voting, y_pred_voting = majority_voting(x, y, y_labels)
 
-    # pd.set_option('display.max_rows', 150)
-    # df = pd.DataFrame(np.array([y, y_pred_voting]).T, columns=['True labels', 'Clf'])
-    # print(df[df['True labels'] != df['Clf']])
+    sns.set_context(rc={"font.size": 12, "axes.titlesize": 15, "axes.labelsize": 13})
+    plot_cm_pink_xD(cm_rf, 'Random Forest')
+    plot_cm_pink_xD(cm_voting, 'Majority Voting')
+
+    pd.set_option('display.max_rows', 150)
+    df = pd.DataFrame(np.array([y, y_pred_voting]).T, columns=['True labels', 'Clf'])
+    print(df[df['True labels'] != df['Clf']])
 
     sns.set()
     sns.set_palette('PuRd_r')

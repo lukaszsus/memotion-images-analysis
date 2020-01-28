@@ -32,7 +32,8 @@ Jako strukturę rozumie się liczbę podobrazów, z~których składa się grafik
 │   ├── pics_feature_binaries       # pliki binarne z cechami wyliczonymi dla obrazów z base_dataset        
 │   ├── results             # tu zapisywane są wszystkie metryki i obrazki do prezentacji i raportu         
 │      ├── metrics         # metryki z eksperymentów           
-│      ├── plots           # wykresy, także zapisane w postaci graficznej tabelki z wynikami oraz macierze pomyłek     
+│      ├── plots           # wykresy, także zapisane w postaci graficznej tabelki z wynikami oraz macierze pomyłek
+│      ├── segmentation    # wykrywanie struktury                  
 │      ├── tables          # tabele z f1 score i accuracy  
 
 ├── data_loader             # funkcje do ładowanie danych do pamięci    
@@ -88,7 +89,10 @@ Jako strukturę rozumie się liczbę podobrazów, z~których składa się grafik
 │   ├── single_image_plotter.py     
 │   └── utils.py        
 
+├── AOW prezentacja końcowa.pdf         
+├── AOW prezentacja końcowa.pptx      
 ├── README.md       
+├── requirements.txt               
 ├── settings.py         # importer ścieżek z user_settings.py   
 └── user_settings.py    # konfiguracja potrzebnych ścieżek do danych i projektu     
 ```
@@ -109,6 +113,8 @@ Gwarantuje ono łatwość uruchomienia poszczególnych skryptów.
     
 - Eksperymenty dotyczące wykrywania struktury obrazów zawierają się w jednym pliku `experiment_scripts/experiments_image_segmentation.py`
 
+- Środowisko, w którym przeprowadzano badania zostało zdefiniowane w requirements.txt.
+
 ### Instrukcja uruchomienia
 
 1. Należy zdefiniować zmienne `DATA_PATH` oraz `PROJECT_PATH` w pliku `user_settings.py`.
@@ -118,17 +124,23 @@ Proponowanym rozwiązaniem jest umieszczenie folderu `data` w katalogu `PROJECT_
 1. Projekt był rozwijany w środowisku PyCharm, dlatego proponuje się urochemie go w tym właśnie środowisku. 
 Jako katalog projektu należy podać katalog główny (ten sam, do którego prowadzi ścieżka `PROJECT_PATH`).
 
+1. Aby skonfigurować środowisko do postaci, w której przeprowadzane były badania, należ wykonać:
+    ```
+    pip install -r requirements.txt
+    ```
+   w katalogu głównym projektu.
+
 1. Eksperymenty dotyczące tesktury powinny rozpocząć się od wygenerowania cech numerycznych. Można to wykonać uruchmiając plik `experiment_scripts/create_features.py`.
 Skrypt przyjmuje trzy argumenty. Był on jako jedyny uruchamiany nie za pośrednictwem IDE, a prosto z terminala. 
 Dzięki temu można było podzielić zbiór danych na memy i obrazy (przetworzyć je w osobnych terminalach) i w ten sposób przyspieszyć proces generacji cech. 
 Poniżej przedstawino przykładowe polecenia, które należy wkleić do terminala otwartego w głównym katalogu projektu.
     ```
-    python3 experiment_scripts/create_features.py --source-path "data/base_dataset" --type "pics" --dst-path "data/pics_feature_binaries"
+    python3 experiment_scripts/create_features.py --source-path "base_dataset" --type "pics" --dst-path "pics_feature_binaries"
     ```
     ```
-    python3 experiment_scripts/create_features.py --source-path "data/base_dataset" --type "memes" --dst-path "data/memes_feature_binaries"
+    python3 experiment_scripts/create_features.py --source-path "base_dataset" --type "memes" --dst-path "memes_feature_binaries"
     ```
-   Ważne, aby argument `dst-path` wskazywał na katalog w `DATA_PATH`. W przeciwnym wypadku nie zadziała dalsze przetwarzanie.
+   Ważne, że argumenty `source-path` i `dst-path` są i tak względem ścieżki zdefiniowanej w `DATA_PATH`.
    
 1. Następnie należy uruchomić plik `experiment_scripts/create_pca_features.py`, aby wygenerować cechy powstałe w wyniku redukcji wymiarowości. 
 Ten plik można już uruchomić z poziomu PyCharma. 

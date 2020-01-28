@@ -259,7 +259,7 @@ if __name__ == "__main__":
          '{}_kmeans_segementator_mean_color_diffs_25',
          '{}_kmeans_segementator_mean_color_diffs_35',
          '{}_kmeans_segementator_mean_color_diffs_45',
-         '{}_kmeans_segementator_mean_color_diffs_55']
+         '{}_kmeans_segementator_mean_color_diffs_55'],
         ['{}_kmeans_segementator_hsv_differences_3',
          '{}_kmeans_segementator_hsv_differences_6',
          '{}_kmeans_segementator_hsv_differences_9',
@@ -329,7 +329,7 @@ if __name__ == "__main__":
          '{}_kmeans_segementator_hsv_differences_35',
          '{}_kmeans_segementator_hsv_differences_45',
          '{}_kmeans_segementator_hsv_differences_55',
-         '{}_gabor_filter']
+         '{}_gabor_filter'],
         ['{}_pca_top_5'],
         ['{}_pca_top_10'],
         ['{}_pca_top_15'],
@@ -354,12 +354,12 @@ if __name__ == "__main__":
         ['scalar_hsv_kmeans'],
         ['kmeans_hsv3'],
         ['kmeans_mean3'],
-        ['scalar_hsv_kmeans3']
+        ['scalar_hsv_kmeans3'],
         ['gabor_filter'],
         ['scalar_gabor'],
         ['scalar_hsv_gabor'],
         ['scalar_hsv_kmeans_gabor'],
-        ['scalar_kmeans_gabor']
+        ['scalar_kmeans_gabor'],
         ['pca_top_5'],
         ['pca_top_10'],
         ['pca_top_15'],

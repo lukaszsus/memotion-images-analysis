@@ -70,6 +70,8 @@ def hough_tests_for_all_params(plot_stats=True, plot=False, verbose=True):
 
 def save_df_to_csv(df, timestamp, min_ct=None, max_ct=None, min_mask=None, max_mask=None):
     path = os.path.join(DATA_PATH, 'results', 'segmentation')
+    if not os.path.exists(path):
+        os.makedirs(path, exist_ok=True)
     fn_prefix = f'experiments_{str(timestamp).split(".")[0]}'
     file_name = fn_prefix + '.csv' if min_ct is None else fn_prefix + f'_{min_ct}_{max_ct}_{min_mask}_{max_mask}.csv'
     df.to_csv(os.path.join(path, file_name), index=False)

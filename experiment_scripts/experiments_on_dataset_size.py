@@ -228,7 +228,7 @@ if __name__ == "__main__":
          '{}_kmeans_segementator_mean_color_diffs_35',
          '{}_kmeans_segementator_mean_color_diffs_45',
          '{}_kmeans_segementator_mean_color_diffs_55',
-         '{}_gabor_filter']
+         '{}_gabor_filter'],
         ['{}_bilateral_filter_h_from_hsv_differences',
          '{}_bilateral_filter_mean_color_diffs',
          '{}_bilateral_filter_n_color_diff',
