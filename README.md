@@ -8,6 +8,11 @@ The project's aim was to classify texture and structure of memes and pictures. W
 
 As a structure we consider the number of subimages that the picture consist of. Correct prediction mean detecting the correct number of subimages.
 
+Project uses classical methods and compares the results with deep learning model. Classical methods mean:
+- manually extracted features,
+- classifiers different from deep neural networks, for instance decision trees, random forest, mulp, naive bayes.
+We used pretrained VGG-16 to compare results with deep learning model.
+
 # Analiza tektury i struktury memów i obrazów
 Projekt wykonywany w ramach przedmiotu Analiza Obrazów i Wideo.
 Celem projektu jest określanie tesktury i struktury memów i obrazów. Rozpoznawane są 4 klasy tekstury:
