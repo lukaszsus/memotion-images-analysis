@@ -1,3 +1,13 @@
+# Texture and structure analysis of memes
+Project was done as a part of academic course: 'Image and Video Analysis'.
+The project's aim was to classify texture and structure of memes and pictures. We defined 4 classes of texture:
+- photograph,
+- painting,
+- cartoon,
+- text (for example screenshot of chat).
+
+As a structure we consider the number of subimages that the picture consist of. Correct prediction mean detecting the correct number of subimages.
+
 # Analiza tektury i struktury memów i obrazów
 Projekt wykonywany w ramach przedmiotu Analiza Obrazów i Wideo.
 Celem projektu jest określanie tesktury i struktury memów i obrazów. Rozpoznawane są 4 klasy tekstury:
