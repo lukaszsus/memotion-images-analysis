@@ -16,6 +16,7 @@ Project uses classical methods and compares the results with deep learning model
   - multilayer perceptron (one hidden layer),
   - naive bayes,
   - knn.
+  
 We used pretrained VGG-16 to compare results with deep learning model.
 
 # Analiza tektury i struktury memów i obrazów
