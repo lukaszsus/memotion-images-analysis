@@ -11,11 +11,11 @@ As a structure we consider the number of subimages that the picture consist of. 
 Project uses classical methods and compares the results with deep learning model. Classical methods mean:
 - manually extracted features,
 - classifiers as:
- - decision trees,
- - random forest,
- - multilayer perceptron (one hidden layer),
- - naive bayes,
- - knn.
+  - decision trees,
+  - random forest,
+  - multilayer perceptron (one hidden layer),
+  - naive bayes,
+  - knn.
 We used pretrained VGG-16 to compare results with deep learning model.
 
 # Analiza tektury i struktury memów i obrazów
